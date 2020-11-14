@@ -1,5 +1,5 @@
 
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ParkingLotJson {
   bool statePL;
@@ -9,8 +9,10 @@ class ParkingLotJson {
   int price;
   String id;
   int deposit;
-  String numberPhone;
+  int numberPhone;
   int penalty;
+  GeoPoint geoPoint;
+  double distance;
 
   ParkingLotJson(
       {this.statePL,
@@ -21,7 +23,10 @@ class ParkingLotJson {
         this.id,
         this.deposit,
         this.numberPhone,
-        this.penalty});
+        this.penalty,
+        this.geoPoint,
+        this.distance
+      });
 
   ParkingLotJson.fromJson(Map<String, dynamic> json) {
     statePL = json['statePL'];
@@ -35,6 +40,10 @@ class ParkingLotJson {
     deposit = json['deposit'];
     numberPhone = json['numberPhone'];
     penalty = json['penalty'];
+    geoPoint = json['location'] != null
+        ? json['location']
+        : null;
+    distance = json['distance'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +59,10 @@ class ParkingLotJson {
     data['deposit'] = this.deposit;
     data['numberPhone'] = this.numberPhone;
     data['penalty'] = this.penalty;
+    if (this.geoPoint != null) {
+      data['location'] = this.geoPoint;
+    }
+    data['distance'] = this.distance;
     return data;
   }
 }
@@ -91,3 +104,19 @@ class AllPoints {
     return data;
   }
 }
+
+class ArrangePoint{
+  String point;
+  ArrangePoint({this.point});
+}
+
+List<ArrangePoint> arrangePoint = [
+  ArrangePoint(point: 'A1'),
+  ArrangePoint(point: 'A2'),
+  ArrangePoint(point: 'B1'),
+  ArrangePoint(point: 'B2'),
+  ArrangePoint(point: 'C1'),
+  ArrangePoint(point: 'C2'),
+  ArrangePoint(point: 'D1'),
+  ArrangePoint(point: 'D2'),
+];

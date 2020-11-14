@@ -1,5 +1,5 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 
 class AddParkingLots{
   CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
@@ -49,7 +49,7 @@ class AddParkingLots{
         .update({
       'id' : 'N007',
       'namePL': 'Bãi đỗ học viện ngoại giao',
-      'address': 'Số 69 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội 100000, Việt Nam',
+      'address': 'Số 69 Chùa Láng, Láng Thượng, Đống Đa, Hà Nội, Việt Nam',
       'location': GeoPoint(21.023254, 105.806488),
       'price' : 15,
       'penalty' : 200,
@@ -62,7 +62,7 @@ class AddParkingLots{
         .update({
       'id' : 'N006',
       'namePL': 'Bãi đỗ kinh tế quốc dân',
-      'address': 'Số 12 Chùa Bộc, Quang Trung, Đống Đa, Hà Nội',
+      'address': '207 Giải Phóng, Đồng Tâm, Hai Bà Trưng, Hà Nội, Việt Nam',
       'location': GeoPoint(21.037313, 105.788925),
       'price' : 15,
       'penalty' : 45,
@@ -87,8 +87,8 @@ class AddParkingLots{
         .doc('N004')
         .update({
       'id' : 'N004',
-      'namePL': 'Bãi đỗ dại học Hà Nội',
-      'address': 'Số 12 Chùa Bộc, Quang Trung, Đống Đa, Hà Nội',
+      'namePL': 'Bãi đỗ đại học Hà Nội',
+      'address': 'Km 9 Nguyễn Trãi, P. Văn Quán, Hà Đông, Hà Nội, Việt Nam',
       'location': GeoPoint(20.989433, 105.795311),
       'price' : 15,
       'penalty' : 30,
@@ -101,7 +101,7 @@ class AddParkingLots{
         .update({
       'id' : 'N003',
       'namePL': 'Bãi đỗ học viện báo chí và tuyên truyền',
-      'address': 'Số 12 Chùa Bộc, Quang Trung, Đống Đa, Hà Nội',
+      'address': '36 Xuân Thủy, Dịch Vọng Hậu, Cầu Giấy, Hà Nội, Việt Nam',
       'location': GeoPoint(21.037313, 105.788925),
       'price' : 12,
       'penalty' : 50,
@@ -161,6 +161,32 @@ class AddParkingLots{
       });
     });
   }
+  void getStatePL() async {
+    bool _statePL = false;
+    await parkingLot
+    .get()
+        .then((value){
+       value.docs.forEach((element) {
+         var _allPoint = AllPoints.fromJson(element.data()['allPoints']);
+         _checkState(_allPoint.toJson(), _statePL, element.id);
+       });
+    });
+  }
+  _checkState(Map<dynamic, dynamic> list, bool statePL, String id) async {
+    await list.forEach((key, value) {
+      if (value == false){
+        statePL = true;
+      }
+    });
+    _changeStatePL(id, statePL);
+  }
+  _changeStatePL(String id, bool state) {
+    parkingLot
+    .doc(id)
+        .update({
+      'statePL' : state
+    }).then((value) => state = false);
+  }
   void deleteReservation(){
     DateTime time = DateTime.now();
     var allPoints = {};
@@ -212,4 +238,5 @@ class AddParkingLots{
       });
     });
   }
+
 }
