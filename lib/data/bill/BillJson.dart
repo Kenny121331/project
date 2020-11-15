@@ -1,35 +1,56 @@
 
 
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserStateJson {
+class BillJson {
   String addressPL;
   String namePL;
   String nameUser;
-  String idPL;
+  int phoneNumbersPL;
   String idUser;
+  String idPoint;
+  String idPL;
   String namePoint;
-  Timestamp rentedTime, returnTime;
-  UserStateJson(
+  int deposit;
+  int price;
+  int penalty;
+  Timestamp rentedTime;
+  Timestamp returnTime;
+  String idBill;
+
+  BillJson(
       {this.addressPL,
         this.namePL,
         this.nameUser,
-        this.idPL,
+        this.phoneNumbersPL,
         this.idUser,
+        this.idPoint,
+        this.idPL,
         this.namePoint,
+        this.deposit,
+        this.price,
+        this.penalty,
+        this.returnTime,
         this.rentedTime,
-        this.returnTime
+        this.idBill
       });
 
-  UserStateJson.fromJson(Map<String, dynamic> json) {
+  BillJson.fromJson(Map<String, dynamic> json) {
     addressPL = json['addressPL'];
     namePL = json['namePL'];
     nameUser = json['nameUser'];
-    idPL = json['idPL'];
+    phoneNumbersPL = json['phoneNumbersPL'];
     idUser = json['idUser'];
+    idPoint = json['idPoint'];
+    idPL = json['idPL'];
     namePoint = json['namePoint'];
+    deposit = json['deposit'];
+    price = json['price'];
+    penalty = json['penalty'];
     rentedTime = json['rentedTime'];
     returnTime = json['returnTime'];
+    idBill = json['idBill'];
   }
 
   Map<String, dynamic> toJson() {
@@ -37,11 +58,17 @@ class UserStateJson {
     data['addressPL'] = this.addressPL;
     data['namePL'] = this.namePL;
     data['nameUser'] = this.nameUser;
-    data['idPL'] = this.idPL;
+    data['phoneNumbersPL'] = this.phoneNumbersPL;
     data['idUser'] = this.idUser;
+    data['idPoint'] = this.idPoint;
+    data['idPL'] = this.idPL;
     data['namePoint'] = this.namePoint;
+    data['deposit'] = this.deposit;
+    data['price'] = this.price;
+    data['penalty'] = this.penalty;
     data['rentedTime'] = this.rentedTime;
     data['returnTime'] = this.returnTime;
+    data['idBill'] = this.idBill;
     return data;
   }
 }

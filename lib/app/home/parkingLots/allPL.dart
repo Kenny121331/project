@@ -8,7 +8,7 @@ import 'detailsPL.dart';
 class AllParkingLots extends StatelessWidget {
   static final ROUTER = '/AllParkingLots';
   CollectionReference parkingLots = FirebaseFirestore.instance.collection('parkingLot');
-  //Map<dynamic, dynamic> parkingLot = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

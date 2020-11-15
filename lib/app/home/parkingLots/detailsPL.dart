@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_parkinglots/app/home/home.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/pointDetails/allPoints.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:intl/intl.dart';
@@ -24,9 +25,9 @@ class _DetailsState extends State<Details> {
   DateTime rentedTime, returnTime;
   final String documentId;
   _DetailsState({this.documentId});
-
   CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
   CollectionReference users = FirebaseFirestore.instance.collection('users');
+  CollectionReference point = FirebaseFirestore.instance.collection('point');
   final FirebaseAuth user = FirebaseAuth.instance;
   Widget richText(String text1, int text2, String text3) {
     return Padding(
@@ -57,9 +58,9 @@ class _DetailsState extends State<Details> {
       onShowPicker: (context, currentValue) async {
         final date = await showDatePicker(
             context: context,
-            firstDate: DateTime(1900),
+            firstDate: DateTime(2015),
             initialDate: currentValue ?? DateTime.now(),
-            lastDate: DateTime(2100));
+            lastDate: DateTime(2025));
         if (date != null) {
           final time = await showTimePicker(
             context: context,
@@ -150,6 +151,8 @@ class _DetailsState extends State<Details> {
             rentedTime: rentedTime,
             returntime: returnTime,
           )));
+          //await _chooseColor();
+          //print(_color);
         }
       }
     } else {
@@ -191,6 +194,12 @@ class _DetailsState extends State<Details> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.directions),
+            onPressed: (){
+              //_checkColor();
+            },
+          ),
           title: Text(
               'Parking lot'
           ),
@@ -198,7 +207,7 @@ class _DetailsState extends State<Details> {
             IconButton(
               icon: Icon(Icons.home),
               onPressed: (){
-
+                Navigator.pushNamed(context, Home.ROUTER);
               },
             )
           ],

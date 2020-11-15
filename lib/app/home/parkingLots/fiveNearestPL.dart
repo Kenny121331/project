@@ -45,7 +45,7 @@ class FiveNearstPL extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      height: 120,
+                      height: 130,
                       width: double.infinity,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(15.0)),

@@ -105,18 +105,20 @@ class AllPoints {
   }
 }
 
-class ArrangePoint{
+
+class ArrangePoint2{
   String point;
-  ArrangePoint({this.point});
+  bool state;
+  ArrangePoint2({this.point, this.state});
 }
 
-List<ArrangePoint> arrangePoint = [
-  ArrangePoint(point: 'A1'),
-  ArrangePoint(point: 'A2'),
-  ArrangePoint(point: 'B1'),
-  ArrangePoint(point: 'B2'),
-  ArrangePoint(point: 'C1'),
-  ArrangePoint(point: 'C2'),
-  ArrangePoint(point: 'D1'),
-  ArrangePoint(point: 'D2'),
+List<ArrangePoint2> arrangePoint2 = [
+  ArrangePoint2(point: 'A1', state: true),
+  ArrangePoint2(point: 'A2', state: true),
+  ArrangePoint2(point: 'B1', state: true),
+  ArrangePoint2(point: 'B2', state: true),
+  ArrangePoint2(point: 'C1', state: true),
+  ArrangePoint2(point: 'C2', state: true),
+  ArrangePoint2(point: 'D1', state: true),
+  ArrangePoint2(point: 'D2', state: true),
 ];

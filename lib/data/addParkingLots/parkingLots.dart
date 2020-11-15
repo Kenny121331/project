@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 
 class AddParkingLots{
   CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
   CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  CollectionReference point = FirebaseFirestore.instance.collection('point');
+  final DateTime _now = DateTime.now();
   void addParkingLot(){
     parkingLot
         .doc('N010')
@@ -77,9 +80,9 @@ class AddParkingLots{
       'namePL': 'Bãi đỗ đại học thăng long',
       'address': 'Số 12 Chùa Bộc, Quang Trung, Đống Đa, Hà Nội',
       'location': GeoPoint(20.976086, 105.815529),
-      'Giá một giờ thuê' : 15,
-      'Giá phạt quá hạn' : 30,
-      'tổng số chỗ' : 400,
+      'price' : 15,
+      'deposit' : 30,
+      'penalty' : 400,
       'numberPhone' : 5555555555,
       //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
     }); //Đại học Thăng Long
@@ -187,56 +190,57 @@ class AddParkingLots{
       'statePL' : state
     }).then((value) => state = false);
   }
-  void deleteReservation(){
-    DateTime time = DateTime.now();
-    var allPoints = {};
-    userState
-        .get().then((value){
-      if (value.docs.length != null){
-        value.docs.forEach((element) {
-          print('checked');
-          if (element.data()['reserveTime'] != null){
-            print('check day: ${element.data()['cancelTime']['day'] < time.day}');
-            if(element.data()['cancelTime']['day'] < time.day){
-              print(element.data()['cancelTime']['day']);
-              _deleteUserState(element.data()['idParkingLot'], element.id, element.data()['vị trí'], allPoints);
-            } else if(element.data()['cancelTime']['day'] == time.day) {
-              print('check hour: ${element.data()['cancelTime']['hour'] < time.hour}');
-              if (element.data()['cancelTime']['hour'] < time.hour){
-                print(element.data()['cancelTime']['hour']);
-                _deleteUserState(element.data()['idParkingLot'], element.id, element.data()['vị trí'], allPoints);
-              } else if (element.data()['cancelTime']['hour'] == time.hour){
-                if (element.data()['cancelTime']['minute'] < time.minute){
-                  _deleteUserState(element.data()['idParkingLot'], element.id, element.data()['vị trí'], allPoints);
-                } else{
-                  print('cancel');
-                }
-              }
-            }
-          }
-        });
+  void changePoint(String idPL, String namePoint, bool addOrDelete) async {
+    Map<String, dynamic> _allPoints;
+    await parkingLot
+    .doc(idPL)
+    .get()
+    .then((value){
+      _allPoints = value.data()['allPoints'];
+    });
+    await _allPoints.forEach((key, value) {
+      if (key == namePoint){
+        _allPoints[key] = addOrDelete;
+        print(addOrDelete);
       }
     });
-  }
-  _deleteUserState(String idPL, String idState, String point, Map<dynamic, dynamic> allPoint){
+    print(_allPoints);
     parkingLot
-        .doc(idPL)
-        .get()
-        .then((value){
-      allPoint = value.data()['allPoints'];
-    }).then((value2){
-      allPoint.forEach((key, value) {
-        if (key == point){
-          allPoint[key] = false;
-        }
-        parkingLot
-            .doc(idPL)
-            .update({
-          'allPoints' : allPoint
-        }).then((value) => userState.doc(idState).delete()
-            .then((value) => allPoint.clear()));
-      });
+    .doc(idPL)
+    .update({
+      'allPoints' : _allPoints
     });
   }
-
+  void checkReservation(){
+    userState
+    .get()
+        .then((value){
+       value.docs.forEach((element) async {
+         var _userState = UserStateJson.fromJson(element.data());
+         if (
+         (_userState.notUsed == null) &&
+         (_userState.stateRent == false) &&
+             (_now.isAfter(_userState.rentedTime.toDate().add(Duration(minutes: 15))))
+         ){
+           await userState.doc(element.id).update({'notUsed' : true});
+           await point.doc(_userState.idPoint).get().then((value){
+             if (value.data().isNotEmpty){
+               point.doc(_userState.idPoint).delete();
+             }
+           });
+           changePoint(_userState.idPL, _userState.namePoint, false);
+         } else if (
+         (_now.isAfter(_userState.returnTime.toDate())) && (_userState.notUsed == null)
+         ){
+           await userState.doc(element.id).update({'notUsed' : true});
+           await point.doc(_userState.idPoint).get().then((value){
+             if (value.data().length > 0){
+               point.doc(_userState.idPoint).delete();
+             }
+           });
+           changePoint(_userState.idPL, _userState.namePoint, false);
+         }
+       });
+    });
+  }
 }

@@ -16,8 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
         Duration(seconds: 3),
             (){
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil( Home.ROUTER, (Route<dynamic> route) => false);
+          Navigator.pushNamed(context, Home.ROUTER);
         }
     );
   }

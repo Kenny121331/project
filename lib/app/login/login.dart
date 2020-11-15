@@ -37,8 +37,9 @@ class _LoginState extends State<Login> {
   setUp() {
     addParkingLots.addParkingLot();
     addParkingLots.getPoints();
-    addParkingLots.deleteReservation();
     addParkingLots.getStatePL();
+    //addParkingLots.checkPoint();
+    addParkingLots.checkReservation();
   }
   _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.pushNamed(

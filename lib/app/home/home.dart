@@ -3,9 +3,12 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_parkinglots/app/home/bill/bill.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/allPL.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/fiveNearestPL.dart';
+import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/MyRentStates.dart';
+import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
 import 'package:flutter_app_parkinglots/app/home/userInformation/information.dart';
 import 'package:flutter_app_parkinglots/app/login/login.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
@@ -28,10 +31,10 @@ class _HomeState extends State<Home> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   Completer<GoogleMapController> mapController = Completer();
   bool _search = false;
-  GeoPoint _point;
   CollectionReference users = FirebaseFirestore.instance.collection('users');
-  //CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
   CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
+  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
   final FirebaseAuth user = FirebaseAuth.instance;
   String _name='', _numberPhone = '';
   List<Marker> allMarkers = [];
@@ -42,19 +45,23 @@ class _HomeState extends State<Home> {
     _getMarkers();
     _getInfor();
     _getDestination();
+    _announceCancelPoint();
   }
 
   _getCurentLocation() async {
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position){
-      setState(() {
-        _currentPosition = position;
+    if (_currentPosition == null){
+      geolocator
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+          .then((Position position){
+        setState(() {
+          _currentPosition = position;
+        });
       });
-    });
-    List<Placemark> p = await geolocator.placemarkFromCoordinates(
-        _currentPosition.latitude, _currentPosition.longitude);
-    Placemark place = p[0];
+    } else {
+      List<Placemark> p = await geolocator.placemarkFromCoordinates(
+          _currentPosition.latitude, _currentPosition.longitude);
+      Placemark place = p[0];
+    }
   }
   _getMarkers() async {
     parkingLot
@@ -122,51 +129,6 @@ class _HomeState extends State<Home> {
       });
     }
   }
-  // _getUserState() async {
-  //   try{
-  //     userState
-  //         .doc(user.currentUser.uid)
-  //         .get()
-  //         .then((value){
-  //       print(value);
-  //       if (value.data() == null){
-  //         return showDialog<void>(
-  //           context: context,
-  //           barrierDismissible: false, // user must tap button!
-  //           builder: (BuildContext context) {
-  //             return AlertDialog(
-  //               title: Text('Announce'),
-  //               content: SingleChildScrollView(
-  //                   child: Text('Sorry! You haven\'t booked.')
-  //               ),
-  //               actions: <Widget>[
-  //                 RaisedButton(
-  //                   color: Colors.green,
-  //                   child: Text('ok'),
-  //                   onPressed: () {
-  //                     Navigator.pop(context);
-  //                   },
-  //                 ),
-  //               ],
-  //             );
-  //           },
-  //         );
-  //       } else {
-  //         print(value.data()['reserveTime']);
-  //         if (value.data()['rentTime'] == null){
-  //           print('wrong');
-  //
-  //           return Navigator.pushNamed(context, Reservation.ROUTER);
-  //         } else {
-  //
-  //           return Navigator.pushNamed(context, UserHired.ROUTER);
-  //         }
-  //       }
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
   _getInfor(){
     users
     .doc(user.currentUser.uid)
@@ -262,6 +224,7 @@ class _HomeState extends State<Home> {
           ),
           actions: <Widget>[
             RaisedButton(
+              color: Colors.green,
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -271,6 +234,56 @@ class _HomeState extends State<Home> {
         );
       },
     );
+  }
+  _goReservation(){
+    userState
+    .where('stateRent', isEqualTo: false)
+    .where('idUser', isEqualTo: user.currentUser.uid)
+    .get()
+        .then((value){
+          if (value.docs.length > 0) {
+            Navigator.pushNamed(context, MyReservations.ROUTER);
+          } else {
+            _showError('You do not have any reservations');
+          }
+    });
+  }
+  _goRent(){
+    userState
+        .where('stateRent', isEqualTo: true)
+    .where('idUser', isEqualTo: user.currentUser.uid)
+        .get()
+        .then((value){
+      if (value.docs.length > 0) {
+        Navigator.pushNamed(context, MyRentStates.ROUTER);
+      } else {
+        _showError('You do not have any state rents');
+      }
+    });
+  }
+  _goToBill(){
+    bill
+    .where('idUser', isEqualTo: user.currentUser.uid)
+        //.orderBy('rentTime', descending: false)
+        .get()
+        .then((value) {
+       if (value.docs.length > 0){
+         Navigator.pushNamed(context, MyBills.ROUTER);
+       } else {
+         _showError('You do not have any bills');
+       }
+    });
+  }
+  _announceCancelPoint(){
+    userState
+    .where('idUser', isEqualTo: user.currentUser.uid)
+    .where('notUsed', isEqualTo: true)
+    .get()
+        .then((value){
+          if (value.docs.length > 0){
+            _showError('Your state was deleted');
+          }
+    });
   }
 
 
@@ -295,7 +308,7 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.search),
               onPressed: () async {
                 await _query();
-                _chooseDestination = null;
+                //_chooseDestination = null;
               },
             ),
             hintText: 'Enter your destination',
@@ -321,8 +334,9 @@ class _HomeState extends State<Home> {
           return a.compare(b);
         },
         itemSubmitted: (item){
-          _chooseDestination = item;
-          print('submit: $item');
+          if (item != null){
+            _chooseDestination = item;
+          }
         },
         itemBuilder: (context , item) {
           //print(item);
@@ -370,7 +384,7 @@ class _HomeState extends State<Home> {
           GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: CameraPosition(
-                target: LatLng(21.007285, 105.843061) ,
+                target: LatLng(21.007285, 105.843061),
                 zoom: 16
             ),
             myLocationEnabled: false,
@@ -441,19 +455,29 @@ class _HomeState extends State<Home> {
                 ListTile(
                   leading: Icon(Icons.shopping_cart),
                   trailing: Icon(Icons.arrow_right),
-                  title: text('My reservation state'),
-                  //onTap: _getUserState,
+                  title: text('My reservation states'),
+                  onTap: (){
+                    _goReservation();
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.directions_car),
                   trailing: Icon(Icons.arrow_right),
                   title: text('My rental state'),
                   onTap: (){
-                    //_getDestination();
+                    _goRent();
                   },
                 ),
                 ListTile(
                   leading: Icon(Icons.event_note),
+                  trailing: Icon(Icons.arrow_right),
+                  title: text('My bill'),
+                  onTap: (){
+                    _goToBill();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.local_parking),
                   trailing: Icon(Icons.arrow_right),
                   title: text('All parking lots'),
                   onTap: (){
@@ -461,7 +485,7 @@ class _HomeState extends State<Home> {
                   },
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 200),
+                  padding: const EdgeInsets.only(left: 10, top: 100, bottom: 10),
                   child: GestureDetector(
                     onTap: (){
                       FirebaseAuth.instance.signOut().then((_){
@@ -494,13 +518,13 @@ class _HomeState extends State<Home> {
                 ),
               ));
             });
-          }
-          controller.animateCamera(
+            controller.animateCamera(
               CameraUpdate.newLatLngZoom(
                   LatLng(_currentPosition.latitude, _currentPosition.longitude),
                   16
               ),
-          );
+            );
+          }
         },
         child: Icon(Icons.my_location),
       ),
