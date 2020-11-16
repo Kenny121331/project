@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/reservationDetails.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
@@ -16,7 +17,7 @@ class MyReservations extends StatelessWidget {
     );
   }
   CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-
+  final FirebaseAuth user = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class MyReservations extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: userState.where('stateRent', isEqualTo: false).snapshots(),
+        stream: userState.where('idUser', isEqualTo: user.currentUser.uid).where('stateRent', isEqualTo: false).snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Something went wrong');

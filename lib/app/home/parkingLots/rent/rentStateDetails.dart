@@ -183,7 +183,12 @@ class _RentStateDetailsState extends State<RentStateDetails> {
       },
     );
   }
-  _updateTime(){
+  _updateTime()async{
+    await userState.doc(idUserState).get()
+    .then((value){
+      point.doc(value.data()['idPoint'])
+          .update({'returnTime' : _returnTimeNew});
+    });
     userState
         .doc(idUserState)
         .update({

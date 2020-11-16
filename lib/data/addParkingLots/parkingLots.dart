@@ -223,21 +223,13 @@ class AddParkingLots{
              (_now.isAfter(_userState.rentedTime.toDate().add(Duration(minutes: 15))))
          ){
            await userState.doc(element.id).update({'notUsed' : true});
-           await point.doc(_userState.idPoint).get().then((value){
-             if (value.data().isNotEmpty){
-               point.doc(_userState.idPoint).delete();
-             }
-           });
+           await point.doc(_userState.idPoint).delete();
            changePoint(_userState.idPL, _userState.namePoint, false);
          } else if (
-         (_now.isAfter(_userState.returnTime.toDate())) && (_userState.notUsed == null)
+         (_now.isAfter(_userState.returnTime.toDate().add(Duration(minutes: 10)))) && (_userState.notUsed == null)
          ){
            await userState.doc(element.id).update({'notUsed' : true});
-           await point.doc(_userState.idPoint).get().then((value){
-             if (value.data().length > 0){
-               point.doc(_userState.idPoint).delete();
-             }
-           });
+           await point.doc(_userState.idPoint).delete();
            changePoint(_userState.idPL, _userState.namePoint, false);
          }
        });

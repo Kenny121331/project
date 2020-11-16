@@ -141,8 +141,8 @@ class _HomeState extends State<Home> {
       });
     });
   }
-  _getDestination() async {
-    await parkingLot
+  _getDestination() {
+    parkingLot
     .get()
     .then((value){
       value.docs.forEach((element) {
@@ -264,7 +264,6 @@ class _HomeState extends State<Home> {
   _goToBill(){
     bill
     .where('idUser', isEqualTo: user.currentUser.uid)
-        //.orderBy('rentTime', descending: false)
         .get()
         .then((value) {
        if (value.docs.length > 0){
@@ -306,8 +305,8 @@ class _HomeState extends State<Home> {
             contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
             suffixIcon: IconButton(
               icon: Icon(Icons.search),
-              onPressed: () async {
-                await _query();
+              onPressed: () {
+                _query();
                 //_chooseDestination = null;
               },
             ),
@@ -382,6 +381,10 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: <Widget>[
           GoogleMap(
+            onTap: (position){
+              GeoPoint latLng = new GeoPoint(position.latitude, position.longitude);
+              _chooseFivePL(latLng);
+            },
             mapType: MapType.normal,
             initialCameraPosition: CameraPosition(
                 target: LatLng(21.007285, 105.843061),
