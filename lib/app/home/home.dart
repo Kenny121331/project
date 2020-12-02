@@ -11,6 +11,7 @@ import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/MyRentStates.d
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
 import 'package:flutter_app_parkinglots/app/home/userInformation/information.dart';
 import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:flutter_app_parkinglots/data/destination/destinationData.dart';
 import 'package:flutter_app_parkinglots/data/users/users.dart';
@@ -36,6 +37,7 @@ class _HomeState extends State<Home> {
   CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
   CollectionReference bill = FirebaseFirestore.instance.collection('bill');
   final FirebaseAuth user = FirebaseAuth.instance;
+  var addParkingLot = AddParkingLots();
   String _name='', _numberPhone = '';
   List<Marker> allMarkers = [];
   @override
@@ -45,6 +47,7 @@ class _HomeState extends State<Home> {
     _getMarkers();
     _getInfor();
     _getDestination();
+    addParkingLot.checkReservation();
     _announceCancelPoint();
   }
 
@@ -153,6 +156,7 @@ class _HomeState extends State<Home> {
         _destination.add(element.name);
       });
     });
+    _destination.add('My location');
   }
   _query() async {
     if (_chooseDestination == null) {
@@ -179,6 +183,14 @@ class _HomeState extends State<Home> {
           _chooseFivePL(element2.location);
         }
       });
+      if (_chooseDestination.compareTo('My location') == 0){
+        if (_currentPosition == null){
+          _getCurentLocation();
+        } else {
+          GeoPoint _geo = GeoPoint(_currentPosition.latitude, _currentPosition.longitude);
+          _chooseFivePL(_geo);
+        }
+      }
       //_showError('Don\'t find your destination');
     }
   }

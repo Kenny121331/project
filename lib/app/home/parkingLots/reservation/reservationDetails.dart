@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
+import 'package:flutter_app_parkinglots/app/home/home.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/rentStateDetails.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
@@ -42,6 +43,21 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     // TODO: implement initState
     super.initState();
   }
+  _checkConditionCancel(){
+    userState
+    .doc(idUserState)
+        .get()
+        .then((value){
+       UserStateJson _userState = UserStateJson.fromJson(value.data());
+       if (_now.isAfter(_userState.rentedTime.toDate().add(Duration(minutes: 10)))){
+         _announce('Your reservation has been canceled. You have to pay a deposit', (){
+           _cancelPointWithDeposit();
+         });
+       } else {
+         _chooseCancelPoint();
+       }
+    });
+  }
   Future<void> _chooseCancelPoint() async {
     return showDialog<void>(
       context: context,
@@ -58,12 +74,14 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           ),
           actions: <Widget>[
             RaisedButton(
+              color: Colors.green,
               child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             RaisedButton(
+              color: Colors.green,
               child: Text('Yes'),
               onPressed: () {
                 _cancelPoint();
@@ -74,7 +92,14 @@ class _ReservationDetailsState extends State<ReservationDetails> {
       },
     );
   }
-  _cancelPoint() {
+  _cancelPoint() async {
+    await userState
+    .doc(idUserState)
+        .delete();
+    await Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, Home.ROUTER);
+  }
+  _cancelPointWithDeposit() {
     userState
     .doc(idUserState)
         .get()
@@ -97,22 +122,12 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               'idBill' : value2.id
             });
             await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-            Navigator.push(context, MaterialPageRoute(builder: (context) => BillDetails(
+            await Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
               idBill: value2.id,
             )));
           });
     });
-  }
-  _pop(){
-    userState
-    .doc(idUserState)
-        .get()
-        .then((value) => Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Details(
-        documentId: value.data()['idPL'],
-      ))
-    ));
   }
   _rent(){
     userState
@@ -127,10 +142,13 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             .update({
           'stateRent' : true,
           'timeGetPoint' : _now
-        }).then((value) => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => RentStateDetails(
-          idUserState: idUserState,
-        ))));
+        }).then((value) async {
+          await Navigator.pop(context);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => RentStateDetails(
+                idUserState: idUserState,
+              )));
+        });
       } else {
         if(_compareTime(_userState.rentedTime)){
           _announce('You can\'t get this point too early', (){
@@ -139,8 +157,8 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             Navigator.of(context).pop();
           });
         } else {
-          _announce('text', (){
-            _cancelPoint();
+          _announce('Your reservation has been canceled. You have to pay a deposit', (){
+            _cancelPointWithDeposit();
           });
         }
       }
@@ -155,7 +173,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     }
   }
   bool _compareTime(Timestamp rentedTime){
-    print(_now); print(rentedTime.toDate().subtract(Duration(minutes: 10)));
     if (_now.isBefore(rentedTime.toDate().subtract(Duration(minutes: 10)))){
       return true;
     } else {
@@ -194,12 +211,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Booking details'),
-        leading: IconButton(
-          icon: Icon(Icons.local_parking),
-          onPressed: (){
-            _pop();
-          },
-        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.shopping_cart),
@@ -246,7 +257,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)
                               ),
-                              onPressed: _chooseCancelPoint,
+                              onPressed: _checkConditionCancel,
                               child: text('Cancel'),
                             ),
                             Padding(

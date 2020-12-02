@@ -5,7 +5,6 @@ import 'package:flutter_app_parkinglots/app/home/bill/bill.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
 import 'package:intl/intl.dart';
 
-import '../home.dart';
 
 class BillDetails extends StatelessWidget {
   String idBill;
@@ -21,7 +20,7 @@ class BillDetails extends StatelessWidget {
     );
   }
 
-  Widget typeBill(int deposit, int price, int penalty){
+  Widget typeBill(int deposit, int price, int penalty, int timeUsed, int timeOverdue){
     if (deposit != null){
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,14 +34,21 @@ class BillDetails extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            text('Note: You have left the car overdue'),
+            text('Time Used: ${timeUsed ~/ 60} hours ${timeUsed % 60} minutes'),
             text('Money rent: $price k vnd'),
+            text('Time Overdue: ${timeOverdue ~/ 60} hours ${timeOverdue % 60} minutes'),
             text('Money penalty: $penalty k vnd'),
             text('Total: ${price + penalty} k vnd')
           ],
         );
       } else {
-        return text('Total: $price k vnd');
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            text('Time Used: ${timeUsed ~/ 60} hours ${timeUsed % 60} minutes'),
+            text('Money rent: $price k vnd'),
+          ],
+        );
       }
     }
   }
@@ -50,13 +56,6 @@ class BillDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.home),
-          onPressed: (){
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil( Home.ROUTER, (Route<dynamic> route) => false);
-          },
-        ),
         title: Text(
           'Bill details'
         ),
@@ -95,7 +94,7 @@ class BillDetails extends StatelessWidget {
                         text('Phone numbers of PL: ${_bill.phoneNumbersPL.toString()}'),
                         text('From: $_rentedTime'),
                         text('To: $_returnTime'),
-                        typeBill(_bill.deposit, _bill.price, _bill.penalty)
+                        typeBill(_bill.deposit, _bill.price, _bill.penalty, _bill.timeUsed, _bill.timeOverdue)
                       ],
                     )
                   ],

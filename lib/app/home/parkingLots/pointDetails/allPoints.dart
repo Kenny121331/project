@@ -47,12 +47,14 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
           ),
           actions: <Widget>[
             RaisedButton(
+              color: Colors.green,
               child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             RaisedButton(
+              color: Colors.green,
               child: Text('Yes'),
               onPressed: () {
                 //_check();
@@ -118,7 +120,8 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
         'stateRent' : false
       }).then((value2) async {
         await userState.doc(value2.id).update({'idUserState' : value2.id});
-        Navigator.push(
+        await Navigator.pop(context);
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => ReservationDetails(
               idUserState: value2.id,

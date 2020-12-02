@@ -18,6 +18,8 @@ class BillJson {
   Timestamp rentedTime;
   Timestamp returnTime;
   String idBill;
+  int timeUsed;
+  int timeOverdue;
 
   BillJson(
       {this.addressPL,
@@ -33,7 +35,9 @@ class BillJson {
         this.penalty,
         this.returnTime,
         this.rentedTime,
-        this.idBill
+        this.idBill,
+        this.timeUsed,
+        this.timeOverdue
       });
 
   BillJson.fromJson(Map<String, dynamic> json) {
@@ -51,6 +55,8 @@ class BillJson {
     rentedTime = json['rentedTime'];
     returnTime = json['returnTime'];
     idBill = json['idBill'];
+    timeUsed = json['timeUsed'];
+    timeOverdue = json['timeOverdue'];
   }
 
   Map<String, dynamic> toJson() {
@@ -69,6 +75,8 @@ class BillJson {
     data['rentedTime'] = this.rentedTime;
     data['returnTime'] = this.returnTime;
     data['idBill'] = this.idBill;
+    data['timeUsed'] = this.timeUsed;
+    data['timeOverdue'] = this.timeOverdue;
     return data;
   }
 }

@@ -30,7 +30,7 @@ class _RentStateDetailsState extends State<RentStateDetails> {
   var addParkingLot = AddParkingLots();
   int _price, _pricePL, _penaltyPL;
   final format = DateFormat("dd-MM-yyyy HH:mm");
-  Timestamp _returnTime, _rentedTime; DateTime _returnTimeNew;
+  Timestamp _returnTime; DateTime _returnTimeNew;
   final DateTime _now = DateTime.now();
   Widget text(String text) {
     return Padding(
@@ -53,7 +53,6 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         .then((value){
           _returnTime = value.data()['returnTime'];
           _idPL = value.data()['idPL'];
-          _rentedTime = value.data()['rentedTime'];
           _namePoint = value.data()['namePoint'];
        parkingLot
        .doc(_idPL)
@@ -107,29 +106,40 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         'idPL' : _userState.idPL,
         'namePoint' : _userState.namePoint,
         'rentedTime' : _userState.rentedTime,
-        'returnTime' : _userState.returnTime,
+        'returnTime' : _now,
         'phoneNumbersPL' : _userState.phoneNumbersPL,
+        'returnPointTime' : _now,
+        //'timeUsed' : _now.difference(_userState.rentedTime.toDate())
       }).then((value2) async {
         await _updateBill(_userState.rentedTime, _userState.returnTime, value2.id);
         await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BillDetails(
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
           idBill: value2.id,
         )));
       });
     });
   }
   _updateBill(Timestamp rentTime, Timestamp returnTime, String idBill)async{
-    _price = returnTime.toDate().difference(rentTime.toDate()).inHours*_pricePL;
     if (_now.isBefore(returnTime.toDate().add(Duration(minutes: 10)))){
-      bill.doc(idBill).update({
-        'idBill' : idBill,
-        'price' : _price
-      });
-    } else {
+      final _differentTime = _now.difference(rentTime.toDate());
+      print(_differentTime);
+      _price = _differentTime.inHours*_pricePL
+          + ((_differentTime.inMinutes - _differentTime.inHours*60) > 10 ? 1 : 0)*_pricePL;
       bill.doc(idBill).update({
         'idBill' : idBill,
         'price' : _price,
-        'penalty' : _penaltyPL
+        'timeUsed' : _differentTime.inMinutes
+      });
+    } else {
+      final _differentTime = returnTime.toDate().difference(rentTime.toDate());
+      _price = _differentTime.inHours*_pricePL
+          + ((_differentTime.inMinutes - _differentTime.inHours*60) > 10 ? 1 : 0)*_pricePL;
+      bill.doc(idBill).update({
+        'idBill' : idBill,
+        'price' : _price,
+        'penalty' : _penaltyPL,
+        'timeUsed' : _differentTime.inMinutes,
+        'timeOverdue' : _now.difference(returnTime.toDate()).inMinutes
       });
     }
   }
@@ -193,12 +203,15 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         .doc(idUserState)
         .update({
       'returnTime' : _returnTimeNew
-    }).then((value) => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => RentStateDetails(
-          idUserState: idUserState,
-        ))
-    ));
+    }).then((value) async {
+      await Navigator.pop(context);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => RentStateDetails(
+            idUserState: idUserState,
+          ))
+      );
+    });
   }
   _checkPoint(){
     point

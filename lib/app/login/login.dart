@@ -5,6 +5,7 @@ import 'package:flutter_app_parkinglots/app/forgotPassword/forgot.dart';
 import 'package:flutter_app_parkinglots/app/home/splash.dart';
 import 'package:flutter_app_parkinglots/app/register/register.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -35,11 +36,44 @@ class _LoginState extends State<Login> {
     super.initState();
   }
   setUp() {
-    addParkingLots.addParkingLot();
+    addParkingLots..addParkingLot();
     addParkingLots.getPoints();
     addParkingLots.getStatePL();
-    //addParkingLots.checkPoint();
     addParkingLots.checkReservation();
+  }
+  _checkInternet() async {
+    final url = 'https://www.youtube.com/';
+    await http.get(url).then((value) async {
+      print('internet ok');
+    })
+        .catchError((e) => _announce());
+  }
+  Future<void> _announce() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Announce'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('no internet?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            RaisedButton(
+              color: Colors.green,
+              child: Text('ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
   _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Navigator.pushNamed(
@@ -84,6 +118,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    _checkInternet();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       key: _scafoldKey,
@@ -183,7 +218,10 @@ class _LoginState extends State<Login> {
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: RaisedButton(
-                              onPressed: _loginUser,
+                              onPressed: (){
+                                //_checkInternet();
+                                _loginUser();
+                              },
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)
                               ),

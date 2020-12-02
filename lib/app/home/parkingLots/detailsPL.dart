@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/home.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/pointDetails/allPoints.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:intl/intl.dart';
@@ -82,9 +81,9 @@ class _DetailsState extends State<Details> {
       onShowPicker: (context, currentValue) async {
         final date = await showDatePicker(
             context: context,
-            firstDate: DateTime(1900),
+            firstDate: DateTime(2015),
             initialDate: currentValue ?? DateTime.now(),
-            lastDate: DateTime(2100));
+            lastDate: DateTime(2025));
         if (date != null) {
           final time = await showTimePicker(
             context: context,
@@ -92,7 +91,6 @@ class _DetailsState extends State<Details> {
             TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
           );
           returnTime = DateTimeField.combine(date, time);
-          print(returnTime);
           return DateTimeField.combine(date, time);
         } else {
           return currentValue;
@@ -139,13 +137,14 @@ class _DetailsState extends State<Details> {
   }
   _checkTimeChoose() async {
     if (rentedTime != null && rentedTime != null){
-      print('rent: $rentedTime'); print('now: $_now');
-      if (rentedTime.isBefore(_now)){
+      //print('rent: $rentedTime'); print('now: $_now');
+      if (rentedTime.isBefore(_now.subtract(Duration(minutes: 5)))){
         _errorTimeChoose('You have hire the time after now');
       } else {
         if (returnTime.isBefore(rentedTime.add(Duration(hours: 1)))){
           _errorTimeChoose('You have hired at least one hours');
         } else {
+          await Navigator.of(context).pop();
           Navigator.push(context, MaterialPageRoute(builder: (context) => ShowAllPoints(
             documentId: documentId,
             rentedTime: rentedTime,
@@ -188,29 +187,25 @@ class _DetailsState extends State<Details> {
       },
     );
   }
-
+  CollectionReference duration = FirebaseFirestore.instance.collection('duration');
+  _checkDuration(){
+    final next = _now.add(Duration(hours: 4, minutes: 20));
+    Duration _duration = next.difference(_now);
+    print(next.difference(_now));
+    // duration.add({
+    //   'duration' : _duration.inMinutes
+    // }).then((value) => print('add duration')).catchError((onError) => print('error: $onError'));
+    print(6%0);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.directions),
-            onPressed: (){
-              //_checkColor();
-            },
-          ),
           title: Text(
               'Parking lot'
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.home),
-              onPressed: (){
-                Navigator.pushNamed(context, Home.ROUTER);
-              },
-            )
-          ],
+
         ),
         body: FutureBuilder<DocumentSnapshot>(
             future: parkingLot.doc(documentId).get(),
@@ -247,6 +242,18 @@ class _DetailsState extends State<Details> {
                                   onPressed: _showMyDialog,
                                   child: Text(
                                       'Find empty point'
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 80),
+                              child: Center(
+                                child: RaisedButton(
+                                  color: Colors.green,
+                                  onPressed: _checkDuration,
+                                  child: Text(
+                                      'Duration'
                                   ),
                                 ),
                               ),
