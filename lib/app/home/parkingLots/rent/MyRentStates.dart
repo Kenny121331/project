@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_parkinglots/app/forgotPassword/forgot.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/rentStateDetails.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyRentStates extends StatelessWidget {
-  static final ROUTER = '/MyRentStates';
   Widget text(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
@@ -47,12 +48,15 @@ class MyRentStates extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: new GestureDetector(
                   onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => RentStateDetails(
-                          idUserState: _userState.idUserState,
-                        ))
-                    );
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(builder: (context) => RentStateDetails(
+                    //       idUserState: _userState.idUserState,
+                    //     ))
+                    // );
+                    Get.to(RentStateDetails(
+                      idUserState: _userState.idUserState,
+                    ));
                   },
                   child: Container(
                     height: 140,

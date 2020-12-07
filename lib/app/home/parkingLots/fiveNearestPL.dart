@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:get/get.dart';
 
 class FiveNearstPL extends StatelessWidget {
   Widget text(String text, double size, Color color) {
@@ -37,12 +38,15 @@ class FiveNearstPL extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Details(
-                          documentId: _parkingLot.id,
-                        ))
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (context) => Details(
+                      //     documentId: _parkingLot.id,
+                      //   ))
+                      // );
+                      Get.to(DetailsPL(
+                        documentId: _parkingLot.id,
+                      ));
                     },
                     child: Container(
                       height: 130,

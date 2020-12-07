@@ -1,8 +1,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/bill/bill.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 
@@ -63,7 +64,8 @@ class BillDetails extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.event_note),
             onPressed: (){
-              Navigator.pushNamed(context, MyBills.ROUTER);
+              //Navigator.pushNamed(context, MyBills.ROUTER);
+              Get.toNamed(Routers.MYBILLS);
             },
           )
         ],

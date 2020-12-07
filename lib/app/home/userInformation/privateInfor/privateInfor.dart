@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../home.dart';
-
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:get/utils.dart';
+import 'package:get/get.dart';
 
 class ChangeInfor extends StatefulWidget {
-  static final ROUTER ='/ChangeInfor';
 
   @override
   _ChangeInforState createState() => _ChangeInforState();
@@ -40,7 +40,8 @@ class _ChangeInforState extends State<ChangeInfor> {
               RaisedButton(
                 child: Text('Approve'),
                 onPressed: () {
-                  Navigator.pushNamed(context, Home.ROUTER);
+                  //Navigator.pushNamed(context, Home.ROUTER);
+                  Get.toNamed(Routers.HOME);
                 },
               ),
             ],

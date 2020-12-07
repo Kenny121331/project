@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'dart:async';
 import 'home.dart';
 
 class SplashScreen extends StatefulWidget {
-  static final ROUTER = '/SplashScreen';
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(
         Duration(seconds: 3),
             (){
-          Navigator.pushReplacementNamed(context, Home.ROUTER);
+          Get.off(Home());
         }
     );
   }

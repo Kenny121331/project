@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
-import 'package:flutter_app_parkinglots/app/home/home.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/MyRentStates.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/point/PointJson.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 
 class RentStateDetails extends StatefulWidget {
@@ -82,7 +82,8 @@ class _RentStateDetailsState extends State<RentStateDetails> {
               color: Colors.green,
               child: Text('ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],
@@ -113,9 +114,12 @@ class _RentStateDetailsState extends State<RentStateDetails> {
       }).then((value2) async {
         await _updateBill(_userState.rentedTime, _userState.returnTime, value2.id);
         await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
+        //   idBill: value2.id,
+        // )));
+        Get.off(BillDetails(
           idBill: value2.id,
-        )));
+        ));
       });
     });
   }
@@ -178,7 +182,8 @@ class _RentStateDetailsState extends State<RentStateDetails> {
               color: Colors.green,
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
             RaisedButton(
@@ -204,13 +209,16 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         .update({
       'returnTime' : _returnTimeNew
     }).then((value) async {
-      await Navigator.pop(context);
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => RentStateDetails(
-            idUserState: idUserState,
-          ))
-      );
+      await Get.back();
+      // Navigator.pushReplacement(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => RentStateDetails(
+      //       idUserState: idUserState,
+      //     ))
+      // );
+      Get.off(RentStateDetails(
+        idUserState: idUserState,
+      ));
     });
   }
   _checkPoint(){
@@ -280,14 +288,16 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         leading: IconButton(
           icon: Icon(Icons.home),
           onPressed: (){
-            Navigator.pushNamed(context, Home.ROUTER);
+            //Navigator.pushNamed(context, Home.ROUTER);
+            Get.toNamed(Routers.HOME);
           },
         ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.directions_car),
             onPressed: (){
-              Navigator.pushNamed(context, MyRentStates.ROUTER);
+              //Navigator.pushNamed(context, MyRentStates.ROUTER);
+              Get.toNamed(Routers.MYRENTSTATES);
             },
           )
         ],

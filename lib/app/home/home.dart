@@ -4,22 +4,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/bill.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/allPL.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/fiveNearestPL.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/MyRentStates.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
 import 'package:flutter_app_parkinglots/app/home/userInformation/information.dart';
 import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:flutter_app_parkinglots/data/destination/destinationData.dart';
 import 'package:flutter_app_parkinglots/data/users/users.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 
 class Home extends StatefulWidget {
-  static final ROUTER = '/Home';
   @override
   _HomeState createState() => _HomeState();
 }
@@ -81,12 +79,15 @@ class _HomeState extends State<Home> {
               onTap: (){
                 print('this is my marker');
                 print(_parkingLot.numberPhone.toString());
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Details(
-                      documentId: doc.id,
-                    ))
-                );
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => Details(
+                //       documentId: doc.id,
+                //     ))
+                // );
+                Get.to(DetailsPL(
+                  documentId: doc.id,
+                ));
               },
               position: LatLng(_parkingLot.geoPoint.latitude, _parkingLot.geoPoint.longitude),
               infoWindow: InfoWindow(
@@ -169,12 +170,15 @@ class _HomeState extends State<Home> {
          value.docs.forEach((element) {
            if (_chooseDestination.compareTo(element.data()['namePL']) == 0){
              print(element.data()['id']);
-             Navigator.push(
-               context,
-               MaterialPageRoute(builder: (context) => Details(
+             // Navigator.push(
+             //   context,
+             //   MaterialPageRoute(builder: (context) => Details(
+             //     documentId: element.data()['id']
+             //   ))
+             // );
+             Get.to(DetailsPL(
                  documentId: element.data()['id']
-               ))
-             );
+             ));
            }
          });
       });
@@ -202,10 +206,11 @@ class _HomeState extends State<Home> {
             _countDistant(element.data()['location'], point2, element.data()['id']);
           });
     });
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FiveNearstPL())
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => FiveNearstPL())
+    // );
+    Get.toNamed(Routers.FIVENEARSTPL);
   }
   Future<void> _countDistant(GeoPoint point1, GeoPoint point2, String id) async {
     final double distance = await Geolocator().distanceBetween(
@@ -240,7 +245,8 @@ class _HomeState extends State<Home> {
               color: Colors.green,
               child: Text('Ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],
@@ -255,7 +261,8 @@ class _HomeState extends State<Home> {
     .get()
         .then((value){
           if (value.docs.length > 0) {
-            Navigator.pushNamed(context, MyReservations.ROUTER);
+            //Navigator.pushNamed(context, MyReservations.ROUTER);
+            Get.toNamed(Routers.RESERVATION);
           } else {
             _showError('You do not have any reservations');
           }
@@ -268,7 +275,8 @@ class _HomeState extends State<Home> {
         .get()
         .then((value){
       if (value.docs.length > 0) {
-        Navigator.pushNamed(context, MyRentStates.ROUTER);
+        //Navigator.pushNamed(context, MyRentStates.ROUTER);
+        Get.toNamed(Routers.MYRENTSTATES);
       } else {
         _showError('You do not have any state rents');
       }
@@ -280,7 +288,8 @@ class _HomeState extends State<Home> {
         .get()
         .then((value) {
        if (value.docs.length > 0){
-         Navigator.pushNamed(context, MyBills.ROUTER);
+         //Navigator.pushNamed(context, MyBills.ROUTER);
+         Get.toNamed(Routers.MYBILLS);
        } else {
          _showError('You do not have any bills');
        }
@@ -460,12 +469,13 @@ class _HomeState extends State<Home> {
                   trailing: Icon(Icons.arrow_right),
                   title: Text('Profile', style: TextStyle(fontSize: 18),),
                   onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Information()
-                        )
-                    );
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => Information()
+                    //     )
+                    // );
+                    Get.toNamed(Routers.INFORMATION);
                   },
                 ),
                 ListTile(
@@ -492,21 +502,14 @@ class _HomeState extends State<Home> {
                     _goToBill();
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.local_parking),
-                  trailing: Icon(Icons.arrow_right),
-                  title: text('All parking lots'),
-                  onTap: (){
-                    Navigator.pushNamed(context, AllParkingLots.ROUTER);
-                  },
-                ),
                 Padding(
                   padding: const EdgeInsets.only(left: 10, top: 100, bottom: 10),
                   child: GestureDetector(
                     onTap: (){
                       FirebaseAuth.instance.signOut().then((_){
-                        Navigator.of(context)
-                            .pushReplacementNamed( Login.ROUTER);
+                        // Navigator.of(context)
+                        //     .pushReplacementNamed( Login.ROUTER);
+                        Get.offAll(Login());
                       });
                     },
                     child: Text('Log out', style: TextStyle(fontSize: 18, color: Colors.grey),),

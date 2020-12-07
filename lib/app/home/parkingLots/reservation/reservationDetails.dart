@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
-import 'package:flutter_app_parkinglots/app/home/home.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/rentStateDetails.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 
 class ReservationDetails extends StatefulWidget {
@@ -77,7 +76,8 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               color: Colors.green,
               child: Text('No'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
             RaisedButton(
@@ -96,8 +96,10 @@ class _ReservationDetailsState extends State<ReservationDetails> {
     await userState
     .doc(idUserState)
         .delete();
-    await Navigator.pop(context);
-    Navigator.pushReplacementNamed(context, Home.ROUTER);
+    // await Navigator.pop(context);
+    // Navigator.pushReplacementNamed(context, Home.ROUTER);
+    await Get.back();
+    Get.offNamed(Routers.HOME);
   }
   _cancelPointWithDeposit() {
     userState
@@ -122,10 +124,12 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               'idBill' : value2.id
             });
             await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-            await Navigator.pop(context);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
-              idBill: value2.id,
-            )));
+            // await Navigator.pop(context);
+            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
+            //   idBill: value2.id,
+            // )));
+            await Get.back();
+            Get.off(BillDetails(idBill: value2.id));
           });
     });
   }
@@ -143,18 +147,20 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           'stateRent' : true,
           'timeGetPoint' : _now
         }).then((value) async {
-          await Navigator.pop(context);
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => RentStateDetails(
-                idUserState: idUserState,
-              )));
+          await Get.back();
+          // Navigator.push(context,
+          //     MaterialPageRoute(builder: (context) => RentStateDetails(
+          //       idUserState: idUserState,
+          //     )));
+
         });
       } else {
         if(_compareTime(_userState.rentedTime)){
           _announce('You can\'t get this point too early', (){
             print('true - true');
 
-            Navigator.of(context).pop();
+            //Navigator.of(context).pop();
+            Get.back();
           });
         } else {
           _announce('Your reservation has been canceled. You have to pay a deposit', (){
@@ -215,7 +221,8 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           IconButton(
             icon: Icon(Icons.shopping_cart),
             onPressed: (){
-              Navigator.pushNamed(context, MyReservations.ROUTER);
+              //Navigator.pushNamed(context, MyReservations.ROUTER);
+              Get.toNamed(Routers.RESERVATION);
             },
           )
         ],

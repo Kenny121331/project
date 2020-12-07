@@ -4,26 +4,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/pointDetails/allPoints.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 
 
-class Details extends StatefulWidget {
-  static final ROUTER = '/Detail';
+class DetailsPL extends StatefulWidget {
   final String documentId;
-  Details({this.documentId});
+  DetailsPL({this.documentId});
   @override
-  _DetailsState createState() => _DetailsState(
+  _DetailsPLState createState() => _DetailsPLState(
     documentId: documentId
   );
 }
 
-class _DetailsState extends State<Details> {
+class _DetailsPLState extends State<DetailsPL> {
   final format = DateFormat("dd-MM-yyyy HH:mm");
-  DateTime _now = DateTime.now();
+  final DateTime _now = DateTime.now();
   DateTime rentedTime, returnTime;
   final String documentId;
-  _DetailsState({this.documentId});
+  _DetailsPLState({this.documentId});
   final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
   final CollectionReference users = FirebaseFirestore.instance.collection('users');
   final CollectionReference point = FirebaseFirestore.instance.collection('point');
@@ -120,7 +120,8 @@ class _DetailsState extends State<Details> {
               color: Colors.green,
               child: Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
             RaisedButton(
@@ -144,14 +145,17 @@ class _DetailsState extends State<Details> {
         if (returnTime.isBefore(rentedTime.add(Duration(hours: 1)))){
           _errorTimeChoose('You have hired at least one hours');
         } else {
-          await Navigator.of(context).pop();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ShowAllPoints(
+          await Get.back();
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => ShowAllPoints(
+          //   documentId: documentId,
+          //   rentedTime: rentedTime,
+          //   returntime: returnTime,
+          // )));
+          Get.to(ShowAllPoints(
             documentId: documentId,
             rentedTime: rentedTime,
             returntime: returnTime,
-          )));
-          //await _chooseColor();
-          //print(_color);
+          ));
         }
       }
     } else {
@@ -179,7 +183,8 @@ class _DetailsState extends State<Details> {
             RaisedButton(
               child: Text('Approve'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],
@@ -207,40 +212,36 @@ class _DetailsState extends State<Details> {
               if (snapshot.connectionState == ConnectionState.done) {
                 //Map<String, dynamic> data = snapshot.data.data();
                 var _parkingLot = ParkingLotJson.fromJson(snapshot.data.data());
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: ListView(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            text(_parkingLot.namePL),
-                            text(_parkingLot.address),
-                            richText('Parking lot\'s phone number: ', _parkingLot.numberPhone, null),
-                            richText('Price per hour rental: ', _parkingLot.price, ' vnd'),
-                            richText('Overdue penalty price: ', _parkingLot.penalty, ' vnd'),
-                            richText('Booking price: ', _parkingLot.deposit, ' vnd'),
+                return ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          text(_parkingLot.namePL),
+                          text(_parkingLot.address),
+                          richText('Parking lot\'s phone number: ', _parkingLot.numberPhone, null),
+                          richText('Price per hour rental: ', _parkingLot.price, ' vnd'),
+                          richText('Overdue penalty price: ', _parkingLot.penalty, ' vnd'),
+                          richText('Booking price: ', _parkingLot.deposit, ' vnd'),
 
-                            Padding(
-                              padding: const EdgeInsets.only(top: 80),
-                              child: Center(
-                                child: RaisedButton(
-                                  color: Colors.green,
-                                  onPressed: _showMyDialog,
-                                  child: Text(
-                                      'Find empty point'
-                                  ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 80),
+                            child: Center(
+                              child: RaisedButton(
+                                color: Colors.green,
+                                onPressed: _showMyDialog,
+                                child: Text(
+                                    'Find empty point'
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 );
               }
               return Scaffold(

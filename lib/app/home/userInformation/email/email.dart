@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:get/get.dart';
 
 
 class ChangeEmail extends StatefulWidget {
@@ -47,8 +48,9 @@ class _ChangeEmailState extends State<ChangeEmail> {
                     child: Text('Yes'),
                     onPressed: () {
                       user.signOut().then((value){
-                        Navigator.of(context)
-                            .pushNamedAndRemoveUntil( Login.ROUTER, (Route<dynamic> route) => false);
+                        // Navigator.of(context)
+                        //     .pushNamedAndRemoveUntil( Login.ROUTER, (Route<dynamic> route) => false);
+                        Get.offAll(Login());
                       });
                     },
                   ),

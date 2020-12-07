@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/reservationDetails.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:flutter_app_parkinglots/data/point/PointJson.dart';
+import 'package:get/get.dart';
 
 
 class ShowAllPoints extends StatefulWidget {
-  static final ROUTER = '/ShowAllPoint';
   String documentId;
   DateTime rentedTime, returntime;
   ShowAllPoints({this.documentId, this.rentedTime, this.returntime});
@@ -61,7 +61,8 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
               color: Colors.green,
               child: Text('No'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
             RaisedButton(
@@ -96,7 +97,8 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
               color: Colors.green,
               child: Text('ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],
@@ -131,13 +133,16 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
         'stateRent' : false
       }).then((value2) async {
         await userState.doc(value2.id).update({'idUserState' : value2.id});
-        await Navigator.pop(context);
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ReservationDetails(
-              idUserState: value2.id,
-            ))
-        );
+        await Get.back();
+        // Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => ReservationDetails(
+        //       idUserState: value2.id,
+        //     ))
+        // );
+        Get.off(ReservationDetails(
+          idUserState: value2.id,
+        ));
       });
     });
   }

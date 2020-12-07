@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyBills extends StatelessWidget {
-  static final ROUTER = '/MyBills';
+
   Widget text(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
@@ -47,12 +48,15 @@ class MyBills extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => BillDetails(
-                            idBill: _bill.idBill,
-                          ))
-                      );
+                      // Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(builder: (context) => BillDetails(
+                      //       idBill: _bill.idBill,
+                      //     ))
+                      // );
+                      Get.to(BillDetails(
+                        idBill: _bill.idBill,
+                      ));
                     },
                     child: Container(
                       height: 140,

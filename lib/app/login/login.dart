@@ -1,16 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/forgotPassword/forgot.dart';
-import 'package:flutter_app_parkinglots/app/home/splash.dart';
-import 'package:flutter_app_parkinglots/app/register/register.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 
 
 class Login extends StatefulWidget {
-  static final ROUTER = '/Login';
 
   @override
   _LoginState createState() => _LoginState();
@@ -67,7 +65,8 @@ class _LoginState extends State<Login> {
               color: Colors.green,
               child: Text('ok'),
               onPressed: () {
-                Navigator.of(context).pop();
+                //Navigator.of(context).pop();
+                Get.back();
               },
             ),
           ],
@@ -76,10 +75,7 @@ class _LoginState extends State<Login> {
     );
   }
   _navigateAndDisplaySelection(BuildContext context) async {
-    final result = await Navigator.pushNamed(
-        context,
-        Register.ROUTER
-    );
+    final result = await Get.toNamed(Routers.REGISTER);
     if(result != null) {
       _scafoldKey.currentState.showSnackBar(SnackBar(
         content: Text('$result.. Register successful!'),
@@ -99,7 +95,7 @@ class _LoginState extends State<Login> {
             .doc(user.currentUser.uid)
             .update({
           'password' : _password
-        }).then((value) => Navigator.pushNamed(context, SplashScreen.ROUTER));
+        }).then((value) => Get.toNamed(Routers.SPLASHSCREEN));
       })
           .catchError((e){
         setState(() {
@@ -239,7 +235,8 @@ class _LoginState extends State<Login> {
                         padding: const EdgeInsets.only(top: 5),
                         child: GestureDetector(
                           onTap: (){
-                            Navigator.pushNamed(context, GetPassword.ROUTER);
+                            //Navigator.pushNamed(context, GetPassword.ROUTER);
+                            Get.toNamed(Routers.FORGETPASSWORD);
                           },
                           child: Center(
                             child: Text(
