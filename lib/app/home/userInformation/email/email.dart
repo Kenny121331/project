@@ -13,8 +13,8 @@ class _ChangeEmailState extends State<ChangeEmail> {
   String _newEmail;
   String _errorTextEmail = 'The email address is badly formatted';
   bool _stateErrorEmail = false;
-  FirebaseAuth user = FirebaseAuth.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final FirebaseAuth user = FirebaseAuth.instance;
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   _changeEmail() async {
     if (_newEmail == user.currentUser.email){
       _errorTextEmail = 'The new email is the same the old email';

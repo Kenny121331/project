@@ -15,8 +15,8 @@ class ChangeInfor extends StatefulWidget {
 class _ChangeInforState extends State<ChangeInfor> {
 
   String _name, _phoneNumber, _licensePlate;
-  FirebaseAuth user = FirebaseAuth.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final FirebaseAuth user = FirebaseAuth.instance;
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   Future<void> _changeInfor(String name, String phoneNumber, String licensePlate) async {
     users
         .doc(user.currentUser.uid)

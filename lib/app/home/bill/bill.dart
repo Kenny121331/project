@@ -16,7 +16,7 @@ class MyBills extends StatelessWidget {
       ),
     );
   }
-  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
+  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
   final FirebaseAuth user = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {

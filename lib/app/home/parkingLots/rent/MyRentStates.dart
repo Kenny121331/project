@@ -16,7 +16,7 @@ class MyRentStates extends StatelessWidget {
       ),
     );
   }
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
   final FirebaseAuth user = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {

@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 class BillDetails extends StatelessWidget {
   String idBill;
   BillDetails({this.idBill});
-  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
+  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
   Widget text(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),

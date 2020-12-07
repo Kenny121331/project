@@ -18,11 +18,11 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
-  var addParkingLots = AddParkingLots();
+  final addParkingLots = AddParkingLots();
   String _errorEmail, _errorPassword;
   bool _emailCheck = false; bool _passwordCheck = false;
   final FirebaseAuth user = FirebaseAuth.instance;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   final GlobalKey<ScaffoldState> _scafoldKey = new GlobalKey<ScaffoldState>();
   String _email, _password;
   bool _hide = true;

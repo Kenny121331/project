@@ -16,7 +16,7 @@ class MyReservations extends StatelessWidget {
       ),
     );
   }
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
   final FirebaseAuth user = FirebaseAuth.instance;
 
   @override

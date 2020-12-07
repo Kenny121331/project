@@ -25,11 +25,22 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
   DateTime rentedTime, returnTime;
   int _numberPhonePL, _deposit, _price, _penalty;
   _ShowAllPointsState({this.documentId, this.returnTime, this.rentedTime});
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  CollectionReference point = FirebaseFirestore.instance.collection('point');
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
+  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  final CollectionReference point = FirebaseFirestore.instance.collection('point');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   final FirebaseAuth user = FirebaseAuth.instance;
+  final List<ArrangePoint2> arrangePoint2 = [
+    ArrangePoint2(point: 'A1', state: true),
+    ArrangePoint2(point: 'A2', state: true),
+    ArrangePoint2(point: 'B1', state: true),
+    ArrangePoint2(point: 'B2', state: true),
+    ArrangePoint2(point: 'C1', state: true),
+    ArrangePoint2(point: 'C2', state: true),
+    ArrangePoint2(point: 'D1', state: true),
+    ArrangePoint2(point: 'D2', state: true),
+  ];
+
 
   Future<void> _showMyDialog(String point) async {
     return showDialog<void>(
@@ -159,6 +170,7 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
     });
   }
   _checkColor() async {
+    print(documentId);
     point
         .where('idPL', isEqualTo: documentId)
         .get()
@@ -171,14 +183,9 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
           var _point = PointJson.fromJson(element.data());
           if (rentedTime.isAfter(_point.returnTime.toDate().add(Duration(minutes: 20))) ||
               returnTime.isBefore(_point.rentedTime.toDate().subtract(Duration(minutes: 20)))){
-            print(rentedTime);
-            print(_point.returnTime.toDate().add(Duration(minutes: 20)));
-            print(rentedTime.isAfter(_point.returnTime.toDate().add(Duration(minutes: 20))));
-            print(returnTime.isBefore(_point.rentedTime.toDate().subtract(Duration(minutes: 20))));
             print('ok');
           } else {
             print('cancel');
-            print(_point.namePoint);
             arrangePoint2.forEach((element2) {
               if (element2.point == _point.namePoint){
                 setState(() {

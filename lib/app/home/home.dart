@@ -27,19 +27,19 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   BitmapDescriptor parkingLotFull, parkingLotNotFull, myLocation;
   Position _currentPosition;
-  var _destination = <String>[];
+  final  _destination = <String>[];
   String _chooseDestination;
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-  Completer<GoogleMapController> mapController = Completer();
+  final Completer<GoogleMapController> mapController = Completer();
   bool _search = false;
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
+  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
   final FirebaseAuth user = FirebaseAuth.instance;
-  var addParkingLot = AddParkingLots();
+  final  addParkingLot = AddParkingLots();
   String _name='', _numberPhone = '';
-  List<Marker> allMarkers = [];
+  final List<Marker> allMarkers = [];
   @override
   void initState() {
     // TODO: implement initState
@@ -162,7 +162,7 @@ class _HomeState extends State<Home> {
     if (_chooseDestination == null) {
       _showError('please enter your destination');
     } else {
-      await parkingLot
+      parkingLot
       .where('namePL', isEqualTo: _chooseDestination)
           .get()
           .then((value){
@@ -178,7 +178,7 @@ class _HomeState extends State<Home> {
            }
          });
       });
-      await destination.forEach((element2) {
+      destination.forEach((element2) {
         if (_chooseDestination.compareTo(element2.name) == 0){
           _chooseFivePL(element2.location);
         }
@@ -214,6 +214,7 @@ class _HomeState extends State<Home> {
         point2.latitude,
         point2.longitude
     );
+    print(distance);
     parkingLot.doc(id)
     .update({
       'distance' : double.parse((distance/1000).toStringAsFixed(1))

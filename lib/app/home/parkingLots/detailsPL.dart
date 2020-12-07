@@ -24,9 +24,9 @@ class _DetailsState extends State<Details> {
   DateTime rentedTime, returnTime;
   final String documentId;
   _DetailsState({this.documentId});
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
-  CollectionReference point = FirebaseFirestore.instance.collection('point');
+  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference point = FirebaseFirestore.instance.collection('point');
   final FirebaseAuth user = FirebaseAuth.instance;
   Widget richText(String text1, int text2, String text3) {
     return Padding(
@@ -187,16 +187,6 @@ class _DetailsState extends State<Details> {
       },
     );
   }
-  CollectionReference duration = FirebaseFirestore.instance.collection('duration');
-  _checkDuration(){
-    final next = _now.add(Duration(hours: 4, minutes: 20));
-    Duration _duration = next.difference(_now);
-    print(next.difference(_now));
-    // duration.add({
-    //   'duration' : _duration.inMinutes
-    // }).then((value) => print('add duration')).catchError((onError) => print('error: $onError'));
-    print(6%0);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,10 +219,10 @@ class _DetailsState extends State<Details> {
                           children: <Widget>[
                             text(_parkingLot.namePL),
                             text(_parkingLot.address),
-                            richText('Số điện thoại: ', _parkingLot.numberPhone, null),
-                            richText('Giá một giờ thuê ', _parkingLot.price, ' nghìn'),
-                            richText('Giá phạt quá hạn ', _parkingLot.penalty, ' nghìn'),
-                            richText('Giá đặt chỗ ', _parkingLot.deposit, ' nghìn'),
+                            richText('Parking lot\'s phone number: ', _parkingLot.numberPhone, null),
+                            richText('Price per hour rental: ', _parkingLot.price, ' vnd'),
+                            richText('Overdue penalty price: ', _parkingLot.penalty, ' vnd'),
+                            richText('Booking price: ', _parkingLot.deposit, ' vnd'),
 
                             Padding(
                               padding: const EdgeInsets.only(top: 80),
@@ -246,18 +236,6 @@ class _DetailsState extends State<Details> {
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 80),
-                              child: Center(
-                                child: RaisedButton(
-                                  color: Colors.green,
-                                  onPressed: _checkDuration,
-                                  child: Text(
-                                      'Duration'
-                                  ),
-                                ),
-                              ),
-                            )
                           ],
                         ),
                       )

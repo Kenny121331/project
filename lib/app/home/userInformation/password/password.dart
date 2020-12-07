@@ -11,7 +11,7 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePasswordState extends State<ChangePassword> {
-  FirebaseAuth user = FirebaseAuth.instance;
+  final FirebaseAuth user = FirebaseAuth.instance;
   String _oldPassword, _newPassword, _newPasswordCheck;
   String _errorTextPassword, _errorTextNewPassword;
   bool _stateErrorPassword = false;

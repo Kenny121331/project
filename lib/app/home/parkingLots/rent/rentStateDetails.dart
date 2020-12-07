@@ -23,11 +23,11 @@ class RentStateDetails extends StatefulWidget {
 class _RentStateDetailsState extends State<RentStateDetails> {
   String idUserState, _idPL, _namePoint;
   _RentStateDetailsState({this.idUserState});
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  CollectionReference point = FirebaseFirestore.instance.collection('point');
-  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
-  var addParkingLot = AddParkingLots();
+  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
+  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
+  final CollectionReference point = FirebaseFirestore.instance.collection('point');
+  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
+  final  AddParkingLots addParkingLot = AddParkingLots();
   int _price, _pricePL, _penaltyPL;
   final format = DateFormat("dd-MM-yyyy HH:mm");
   Timestamp _returnTime; DateTime _returnTimeNew;

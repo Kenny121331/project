@@ -111,14 +111,3 @@ class ArrangePoint2{
   bool state;
   ArrangePoint2({this.point, this.state});
 }
-
-List<ArrangePoint2> arrangePoint2 = [
-  ArrangePoint2(point: 'A1', state: true),
-  ArrangePoint2(point: 'A2', state: true),
-  ArrangePoint2(point: 'B1', state: true),
-  ArrangePoint2(point: 'B2', state: true),
-  ArrangePoint2(point: 'C1', state: true),
-  ArrangePoint2(point: 'C2', state: true),
-  ArrangePoint2(point: 'D1', state: true),
-  ArrangePoint2(point: 'D2', state: true),
-];

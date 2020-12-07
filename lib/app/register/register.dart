@@ -15,7 +15,7 @@ class _RegisterState extends State<Register> {
   String _errorString;
   bool _error = false;
 
-  CollectionReference users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   final FirebaseAuth user = FirebaseAuth.instance;
 
   Future<void> _createUser() async{
