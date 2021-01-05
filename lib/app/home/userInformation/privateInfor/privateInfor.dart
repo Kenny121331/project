@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/utils.dart';
 import 'package:get/get.dart';
 
@@ -13,10 +14,7 @@ class ChangeInfor extends StatefulWidget {
 }
 
 class _ChangeInforState extends State<ChangeInfor> {
-
   String _name, _phoneNumber, _licensePlate;
-  final FirebaseAuth user = FirebaseAuth.instance;
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   Future<void> _changeInfor(String name, String phoneNumber, String licensePlate) async {
     users
         .doc(user.currentUser.uid)
@@ -26,37 +24,16 @@ class _ChangeInforState extends State<ChangeInfor> {
       'licensePlate' : _licensePlate??licensePlate
     })
         .then((value){
-      print("User Updated");
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false, // user must tap button!
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Announce'),
-            content: SingleChildScrollView(
-                child: Text('Changed successfully your information')
-            ),
-            actions: <Widget>[
-              RaisedButton(
-                child: Text('Approve'),
-                onPressed: () {
-                  //Navigator.pushNamed(context, Home.ROUTER);
-                  Get.toNamed(Routers.HOME);
-                },
-              ),
-            ],
+          showDialogAnnounce(
+            content: 'Changed successfully your information',
+            onCancel: () => Get.toNamed(Routers.HOME)
           );
-        },
-      );
     })
         .catchError((error) => print("Failed to update user: $error"));
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<DocumentSnapshot>(
         future: users.doc(user.currentUser.uid).get(),
         builder:

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 
 
@@ -14,8 +15,6 @@ class _ChangeEmailState extends State<ChangeEmail> {
   String _newEmail;
   String _errorTextEmail = 'The email address is badly formatted';
   bool _stateErrorEmail = false;
-  final FirebaseAuth user = FirebaseAuth.instance;
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   _changeEmail() async {
     if (_newEmail == user.currentUser.email){
       _errorTextEmail = 'The new email is the same the old email';
@@ -29,34 +28,14 @@ class _ChangeEmailState extends State<ChangeEmail> {
             .update({
           'email' : _newEmail
         }).then((value){
-          return showDialog<void>(
-            context: context,
-            barrierDismissible: false, // user must tap button!
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Your email changed'),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: <Widget>[
-                      Text('Please log in again to use your account')
-                    ],
-                  ),
-                ),
-                actions: <Widget>[
-                  RaisedButton(
-                    color: Colors.green,
-                    child: Text('Yes'),
-                    onPressed: () {
-                      user.signOut().then((value){
-                        // Navigator.of(context)
-                        //     .pushNamedAndRemoveUntil( Login.ROUTER, (Route<dynamic> route) => false);
-                        Get.offAll(Login());
-                      });
-                    },
-                  ),
-                ],
-              );
-            },
+          showDialogAnnounce(
+              content: 'Your email changed\n'
+                  'Please log in again to use your account',
+              onCancel: (){
+                user.signOut().then((value){
+                  Get.offAllNamed(Routers.LOGIN);
+                });
+              }
           );
         });
       }).catchError((onError){

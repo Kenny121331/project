@@ -1,25 +1,16 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-
+// ignore: must_be_immutable
 class BillDetails extends StatelessWidget {
   String idBill;
   BillDetails({this.idBill});
-  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
 
   Widget typeBill(int deposit, int price, int penalty, int timeUsed, int timeOverdue){
     if (deposit != null){
@@ -64,7 +55,6 @@ class BillDetails extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.event_note),
             onPressed: (){
-              //Navigator.pushNamed(context, MyBills.ROUTER);
               Get.toNamed(Routers.MYBILLS);
             },
           )

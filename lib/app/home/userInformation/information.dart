@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/userInformation/password/password.dart';
 import 'package:flutter_app_parkinglots/app/home/userInformation/privateInfor/privateInfor.dart';
-
 import 'email/email.dart';
 
 class Information extends StatefulWidget {
@@ -43,15 +42,15 @@ class _InformationState extends State<Information> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              title: Text('Information')
+              label: 'Information'
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.lock_outline),
-              title: Text('Password')
+              label: 'Password'
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.email),
-              title: Text('Email')
+              label: 'Email'
           ),
         ],
         currentIndex: _selectedIndex,

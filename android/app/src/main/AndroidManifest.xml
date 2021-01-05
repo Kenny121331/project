@@ -10,7 +10,7 @@
         android:label="flutter_app_parkinglots"
         android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA0flkU1TJ1Br1K6x5uMBr0hy1KaSDF_ws"/>
+            android:value="AIzaSyBMH7LC_7XgswbWVS4TJ5LllemUqo1oz0U"/>
 
         <activity
             android:name=".MainActivity"

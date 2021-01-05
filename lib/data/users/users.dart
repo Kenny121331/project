@@ -1,6 +1,3 @@
-
-
-
 class UserJson {
   String email;
   String name;

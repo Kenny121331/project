@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/pointDetails/allPoints.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
-
 
 class DetailsPL extends StatefulWidget {
   final String documentId;
@@ -24,33 +23,6 @@ class _DetailsPLState extends State<DetailsPL> {
   DateTime rentedTime, returnTime;
   final String documentId;
   _DetailsPLState({this.documentId});
-  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final CollectionReference point = FirebaseFirestore.instance.collection('point');
-  final FirebaseAuth user = FirebaseAuth.instance;
-  Widget richText(String text1, int text2, String text3) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: RichText(
-        text: TextSpan(
-            children: <TextSpan>[
-              TextSpan(text: text1, style: TextStyle(fontSize: 21, color: Colors.black)),
-              TextSpan(text: '$text2', style: TextStyle(fontSize: 21, color: Colors.black)),
-              TextSpan(text: text3, style: TextStyle(fontSize: 21, color: Colors.black)),
-            ]
-        ),
-      ),
-    );
-  }
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
   Widget dateTimeFieldRent(){
     return DateTimeField(
       format: format,
@@ -120,7 +92,6 @@ class _DetailsPLState extends State<DetailsPL> {
               color: Colors.green,
               child: Text('Cancel'),
               onPressed: () {
-                //Navigator.of(context).pop();
                 Get.back();
               },
             ),
@@ -138,19 +109,17 @@ class _DetailsPLState extends State<DetailsPL> {
   }
   _checkTimeChoose() async {
     if (rentedTime != null && rentedTime != null){
-      //print('rent: $rentedTime'); print('now: $_now');
       if (rentedTime.isBefore(_now.subtract(Duration(minutes: 5)))){
-        _errorTimeChoose('You have hire the time after now');
+        showDialogAnnounce(
+          content: 'You have hire the time after now'
+        );
       } else {
         if (returnTime.isBefore(rentedTime.add(Duration(hours: 1)))){
-          _errorTimeChoose('You have hired at least one hours');
+          showDialogAnnounce(
+              content: 'You have hired at least one hours'
+          );
         } else {
           await Get.back();
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => ShowAllPoints(
-          //   documentId: documentId,
-          //   rentedTime: rentedTime,
-          //   returntime: returnTime,
-          // )));
           Get.to(ShowAllPoints(
             documentId: documentId,
             rentedTime: rentedTime,
@@ -159,38 +128,10 @@ class _DetailsPLState extends State<DetailsPL> {
         }
       }
     } else {
-      _errorTimeChoose('You have choose your time');
+      showDialogAnnounce(
+          content: 'You have choose your time'
+      );
     }
-  }
-  Future<void> _errorTimeChoose(String error) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                  error,
-                  style: TextStyle(color: Colors.red),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              child: Text('Approve'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -210,7 +151,6 @@ class _DetailsPLState extends State<DetailsPL> {
                 return Text("Something went wrong");
               }
               if (snapshot.connectionState == ConnectionState.done) {
-                //Map<String, dynamic> data = snapshot.data.data();
                 var _parkingLot = ParkingLotJson.fromJson(snapshot.data.data());
                 return ListView(
                   children: [
@@ -221,10 +161,22 @@ class _DetailsPLState extends State<DetailsPL> {
                         children: <Widget>[
                           text(_parkingLot.namePL),
                           text(_parkingLot.address),
-                          richText('Parking lot\'s phone number: ', _parkingLot.numberPhone, null),
-                          richText('Price per hour rental: ', _parkingLot.price, ' vnd'),
-                          richText('Overdue penalty price: ', _parkingLot.penalty, ' vnd'),
-                          richText('Booking price: ', _parkingLot.deposit, ' vnd'),
+                          richText(
+                              text1: 'Parking lot\'s phone number: ',
+                              text2: '${_parkingLot.numberPhone}'
+                          ),
+                          richText(
+                              text1: 'Price per hour rental: ',
+                              text2: '${_parkingLot.price} vnd'
+                          ),
+                          richText(
+                              text1: 'Overdue penalty price: ',
+                              text2: '${_parkingLot.penalty} vnd'
+                          ),
+                          richText(
+                              text1: 'Booking price: ',
+                              text2: '${_parkingLot.deposit} vnd'
+                          ),
 
                           Padding(
                             padding: const EdgeInsets.only(top: 80),

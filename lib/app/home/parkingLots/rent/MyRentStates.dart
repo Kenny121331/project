@@ -1,24 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/forgotPassword/forgot.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/rentStateDetails.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyRentStates extends StatelessWidget {
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
-  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  final FirebaseAuth user = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +18,8 @@ class MyRentStates extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: userState.where('idUser', isEqualTo: user.currentUser.uid).where('stateRent', isEqualTo: true).snapshots(),
+        stream: userState.where('idUser', isEqualTo: user.currentUser.uid)
+            .where('stateRent', isEqualTo: true).snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Something went wrong');
@@ -40,7 +31,6 @@ class MyRentStates extends StatelessWidget {
 
           return new ListView(
             children: snapshot.data.docs.map((DocumentSnapshot document) {
-              print(document.data().length);
               var _userState = UserStateJson.fromJson(document.data());
               String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());
               String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_userState.returnTime.toDate());
@@ -48,12 +38,6 @@ class MyRentStates extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: new GestureDetector(
                   onTap: (){
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(builder: (context) => RentStateDetails(
-                    //       idUserState: _userState.idUserState,
-                    //     ))
-                    // );
                     Get.to(RentStateDetails(
                       idUserState: _userState.idUserState,
                     ));

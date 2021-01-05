@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 
 class FiveNearstPL extends StatelessWidget {
@@ -11,7 +12,6 @@ class FiveNearstPL extends StatelessWidget {
       style: TextStyle(fontSize: size, color: color),
     );
   }
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,12 +38,6 @@ class FiveNearstPL extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => Details(
-                      //     documentId: _parkingLot.id,
-                      //   ))
-                      // );
                       Get.to(DetailsPL(
                         documentId: _parkingLot.id,
                       ));

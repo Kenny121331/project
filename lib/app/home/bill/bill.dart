@@ -1,24 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyBills extends StatelessWidget {
 
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
-  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
-  final FirebaseAuth user = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,12 +38,6 @@ class MyBills extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => BillDetails(
-                      //       idBill: _bill.idBill,
-                      //     ))
-                      // );
                       Get.to(BillDetails(
                         idBill: _bill.idBill,
                       ));

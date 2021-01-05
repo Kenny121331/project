@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 
 class AddParkingLots{
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  CollectionReference point = FirebaseFirestore.instance.collection('point');
-  final DateTime _now = DateTime.now();
   void addParkingLot(){
     parkingLot
         .doc('N010')
@@ -204,7 +201,6 @@ class AddParkingLots{
         print(addOrDelete);
       }
     });
-    print(_allPoints);
     parkingLot
     .doc(idPL)
     .update({
@@ -212,6 +208,7 @@ class AddParkingLots{
     });
   }
   void checkReservation(){
+    final DateTime _now = DateTime.now();
     userState
     .get()
         .then((value){
@@ -236,3 +233,5 @@ class AddParkingLots{
     });
   }
 }
+
+final addParkingLots = AddParkingLots();

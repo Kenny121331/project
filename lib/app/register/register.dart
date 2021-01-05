@@ -1,11 +1,10 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
+import 'package:get/get.dart';
 
 class Register extends StatefulWidget {
-  static final ROUTER = '/Register';
   @override
   _RegisterState createState() => _RegisterState();
 }
@@ -14,9 +13,6 @@ class _RegisterState extends State<Register> {
   String _name, _email, _licensePlace, _password, _passwordCheck, _numberPhone;
   String _errorString;
   bool _error = false;
-
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final FirebaseAuth user = FirebaseAuth.instance;
 
   Future<void> _createUser() async{
     if (_password != _passwordCheck) {
@@ -44,7 +40,7 @@ class _RegisterState extends State<Register> {
         })
             .then((value) => print("User Added"))
             .catchError((error) => print("Failed to add user: $error"));
-        Navigator.pop(context, _name);
+        Get.back(result: _name);
       } on FirebaseAuthException catch (e) {
         print('Error: $e');
       } catch (e) {

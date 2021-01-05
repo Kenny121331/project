@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
-
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -11,14 +11,12 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePasswordState extends State<ChangePassword> {
-  final FirebaseAuth user = FirebaseAuth.instance;
   String _oldPassword, _newPassword, _newPasswordCheck;
   String _errorTextPassword, _errorTextNewPassword;
   bool _stateErrorPassword = false;
   bool _stateErrorNewPassword = false;
   Future<void> _changePassword() async {
-    var result = await FirebaseFirestore.instance
-        .collection('users')
+    var result = await users
         .where('email', isEqualTo: user.currentUser.email)
         .where('password', isEqualTo: _oldPassword)
         .get();
@@ -41,43 +39,20 @@ class _ChangePasswordState extends State<ChangePassword> {
     }
   }
   void _changePasswordReal() async{
-    User user = await FirebaseAuth.instance.currentUser;
-    user.updatePassword(_newPassword).then((_){
-      print("Succesfull changed password");
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
+    user.currentUser.updatePassword(_newPassword).then((_){
+      users
+          .doc(user.currentUser.uid)
           .update({
         'password' : _newPassword
       }).then((value){
-        return showDialog<void>(
-          context: context,
-          barrierDismissible: false, // user must tap button!
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Your information changed'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text('Please log in again to use your account')
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                RaisedButton(
-                  color: Colors.green,
-                  child: Text('Approve'),
-                  onPressed: () {
-                    FirebaseAuth.instance.signOut().then((value){
-                      // Navigator.of(context)
-                      //     .pushNamedAndRemoveUntil( Login.ROUTER, (Route<dynamic> route) => false);
-                      Get.offAll(Login());
-                    });
-                  },
-                ),
-              ],
-            );
-          },
+        showDialogAnnounce(
+            content: 'Your information changed\n'
+                'Please log in again to use your account',
+            onCancel: () {
+              FirebaseAuth.instance.signOut().then((value){
+                Get.offAllNamed(Routers.LOGIN);
+              });
+            }
         );
       })
       ;

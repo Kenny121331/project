@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "534285564947",
-    "firebase_url": "https://parkinglots-52875.firebaseio.com",
-    "project_id": "parkinglots-52875",
-    "storage_bucket": "parkinglots-52875.appspot.com"
+    "project_number": "619737208268",
+    "project_id": "cars2-b47c6",
+    "storage_bucket": "cars2-b47c6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:534285564947:android:3fcbdac1dc70f432fd93e6",
+        "mobilesdk_app_id": "1:619737208268:android:5b3e8a6488a1c359c17969",
         "android_client_info": {
           "package_name": "com.example.flutter_app_parkinglots"
         }
       },
       "oauth_client": [
         {
-          "client_id": "534285564947-g5km9tg3cev12liumoc0idg8skqm8qnr.apps.googleusercontent.com",
+          "client_id": "619737208268-9qbcbtflnkc64vk0m009noi0fd2t20av.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBJWuTfLiEKzyKaYmNB-Wo25_iXBbTlNqI"
+          "current_key": "AIzaSyCEswF6TU0j4q1TmdnsKJG1K2OAN0OoPik"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "534285564947-g5km9tg3cev12liumoc0idg8skqm8qnr.apps.googleusercontent.com",
+              "client_id": "619737208268-9qbcbtflnkc64vk0m009noi0fd2t20av.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

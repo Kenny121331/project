@@ -1,23 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/reservationDetails.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyReservations extends StatelessWidget {
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
-  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  final FirebaseAuth user = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +18,8 @@ class MyReservations extends StatelessWidget {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: userState.where('idUser', isEqualTo: user.currentUser.uid).where('stateRent', isEqualTo: false).snapshots(),
+        stream: userState.where('idUser', isEqualTo: user.currentUser.uid)
+            .where('stateRent', isEqualTo: false).snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Text('Something went wrong');
@@ -49,12 +40,6 @@ class MyReservations extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => ReservationDetails(
-                      //       idUserState: _userState.idUserState,
-                      //     ))
-                      // );
                       Get.to(ReservationDetails(
                         idUserState: _userState.idUserState,
                       ));

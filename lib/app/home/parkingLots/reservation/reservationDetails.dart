@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/rent/rentStateDetails.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 
-
+// ignore: must_be_immutable
 class ReservationDetails extends StatefulWidget {
   String idUserState;
   ReservationDetails({this.idUserState});
@@ -22,21 +24,8 @@ class ReservationDetails extends StatefulWidget {
 class _ReservationDetailsState extends State<ReservationDetails> {
   String idUserState;
   _ReservationDetailsState({this.idUserState});
-  CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  CollectionReference point = FirebaseFirestore.instance.collection('point');
-  CollectionReference bill = FirebaseFirestore.instance.collection('bill');
-  var addParkingLots = AddParkingLots();
   final DateTime _now = DateTime.now();
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -49,55 +38,25 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         .then((value){
        UserStateJson _userState = UserStateJson.fromJson(value.data());
        if (_now.isAfter(_userState.rentedTime.toDate().add(Duration(minutes: 10)))){
-         _announce('Your reservation has been canceled. You have to pay a deposit', (){
-           _cancelPointWithDeposit();
-         });
+         showDialogAnnounce(
+           content: 'Your reservation has been canceled. You have to pay a deposit',
+           onCancel: () => _cancelPointWithDeposit()
+         );
        } else {
-         _chooseCancelPoint();
+         showDialogChoose(
+             content: 'Are you sure to cancel this point?',
+            textCancel: 'No',
+            textConfirm: 'Yes',
+            onConfirm: () => _cancelPoint()
+         );
        }
     });
   }
-  Future<void> _chooseCancelPoint() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure to cancel this point?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('No'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-            RaisedButton(
-              color: Colors.green,
-              child: Text('Yes'),
-              onPressed: () {
-                _cancelPoint();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   _cancelPoint() async {
     await userState
     .doc(idUserState)
         .delete();
-    // await Navigator.pop(context);
-    // Navigator.pushReplacementNamed(context, Home.ROUTER);
     await Get.back();
     Get.offNamed(Routers.HOME);
   }
@@ -124,10 +83,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               'idBill' : value2.id
             });
             await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-            // await Navigator.pop(context);
-            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
-            //   idBill: value2.id,
-            // )));
             await Get.back();
             Get.off(BillDetails(idBill: value2.id));
           });
@@ -147,25 +102,20 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           'stateRent' : true,
           'timeGetPoint' : _now
         }).then((value) async {
-          await Get.back();
-          // Navigator.push(context,
-          //     MaterialPageRoute(builder: (context) => RentStateDetails(
-          //       idUserState: idUserState,
-          //     )));
-
+          Get.off(RentStateDetails(
+            idUserState: idUserState,
+          ));
         });
       } else {
         if(_compareTime(_userState.rentedTime)){
-          _announce('You can\'t get this point too early', (){
-            print('true - true');
-
-            //Navigator.of(context).pop();
-            Get.back();
-          });
+          showDialogAnnounce(
+            content: 'You can\'t get this point too early'
+          );
         } else {
-          _announce('Your reservation has been canceled. You have to pay a deposit', (){
-            _cancelPointWithDeposit();
-          });
+          showDialogAnnounce(
+            content: 'Your reservation has been canceled. You have to pay a deposit',
+            onCancel: () => _cancelPointWithDeposit()
+          );
         }
       }
     });
@@ -185,31 +135,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
       return false;
     }
   }
-  Future<void> _announce(String text, Function function) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(text),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              child: Text('Yes'),
-              onPressed: function,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +146,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
           IconButton(
             icon: Icon(Icons.shopping_cart),
             onPressed: (){
-              //Navigator.pushNamed(context, MyReservations.ROUTER);
               Get.toNamed(Routers.RESERVATION);
             },
           )
@@ -231,11 +155,9 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         future: userState.doc(idUserState).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-
           if (snapshot.hasError) {
             return Text("Something went wrong");
           }
-
           if (snapshot.connectionState == ConnectionState.done) {
             var _userState = UserStateJson.fromJson(snapshot.data.data());
             String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());

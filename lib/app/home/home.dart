@@ -3,12 +3,10 @@ import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/bill/bill.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/detailsPL.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/stateReservation.dart';
-import 'package:flutter_app_parkinglots/app/home/userInformation/information.dart';
 import 'package:flutter_app_parkinglots/app/login/login.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
 import 'package:flutter_app_parkinglots/data/destination/destinationData.dart';
@@ -16,6 +14,7 @@ import 'package:flutter_app_parkinglots/data/users/users.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -30,12 +29,6 @@ class _HomeState extends State<Home> {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   final Completer<GoogleMapController> mapController = Completer();
   bool _search = false;
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  final CollectionReference bill = FirebaseFirestore.instance.collection('bill');
-  final FirebaseAuth user = FirebaseAuth.instance;
-  final  addParkingLot = AddParkingLots();
   String _name='', _numberPhone = '';
   final List<Marker> allMarkers = [];
   @override
@@ -45,8 +38,9 @@ class _HomeState extends State<Home> {
     _getMarkers();
     _getInfor();
     _getDestination();
-    addParkingLot.checkReservation();
+    addParkingLots.checkReservation();
     _announceCancelPoint();
+    _getCurentLocation();
   }
 
   _getCurentLocation() async {
@@ -64,6 +58,7 @@ class _HomeState extends State<Home> {
       Placemark place = p[0];
     }
   }
+
   _getMarkers() async {
     parkingLot
         .get()
@@ -77,14 +72,6 @@ class _HomeState extends State<Home> {
               markerId: MarkerId(doc.id),
               icon: _parkingLot.statePL ? parkingLotNotFull : parkingLotFull,
               onTap: (){
-                print('this is my marker');
-                print(_parkingLot.numberPhone.toString());
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) => Details(
-                //       documentId: doc.id,
-                //     ))
-                // );
                 Get.to(DetailsPL(
                   documentId: doc.id,
                 ));
@@ -100,6 +87,7 @@ class _HomeState extends State<Home> {
       });
     });
   }
+
   createMarkerFull(context) {
     if (parkingLotFull == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(context);
@@ -111,6 +99,7 @@ class _HomeState extends State<Home> {
       });
     }
   }
+
   createMarkerNotFull(context){
     if (parkingLotNotFull == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(context);
@@ -122,6 +111,7 @@ class _HomeState extends State<Home> {
       });
     }
   }
+
   createMarkerMyLocation(context){
     if (myLocation == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(context);
@@ -133,6 +123,7 @@ class _HomeState extends State<Home> {
       });
     }
   }
+
   _getInfor(){
     users
     .doc(user.currentUser.uid)
@@ -145,6 +136,7 @@ class _HomeState extends State<Home> {
       });
     });
   }
+
   _getDestination() {
     parkingLot
     .get()
@@ -159,9 +151,10 @@ class _HomeState extends State<Home> {
     });
     _destination.add('My location');
   }
+
   _query() async {
     if (_chooseDestination == null) {
-      _showError('please enter your destination');
+      showDialogAnnounce(content: 'please enter your destination');
     } else {
       parkingLot
       .where('namePL', isEqualTo: _chooseDestination)
@@ -169,13 +162,6 @@ class _HomeState extends State<Home> {
           .then((value){
          value.docs.forEach((element) {
            if (_chooseDestination.compareTo(element.data()['namePL']) == 0){
-             print(element.data()['id']);
-             // Navigator.push(
-             //   context,
-             //   MaterialPageRoute(builder: (context) => Details(
-             //     documentId: element.data()['id']
-             //   ))
-             // );
              Get.to(DetailsPL(
                  documentId: element.data()['id']
              ));
@@ -195,9 +181,9 @@ class _HomeState extends State<Home> {
           _chooseFivePL(_geo);
         }
       }
-      //_showError('Don\'t find your destination');
     }
   }
+
   _chooseFivePL(GeoPoint point2) async {
     await parkingLot
     .get()
@@ -206,12 +192,9 @@ class _HomeState extends State<Home> {
             _countDistant(element.data()['location'], point2, element.data()['id']);
           });
     });
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => FiveNearstPL())
-    // );
     Get.toNamed(Routers.FIVENEARSTPL);
   }
+
   Future<void> _countDistant(GeoPoint point1, GeoPoint point2, String id) async {
     final double distance = await Geolocator().distanceBetween(
         point1.latitude,
@@ -219,41 +202,12 @@ class _HomeState extends State<Home> {
         point2.latitude,
         point2.longitude
     );
-    print(distance);
     parkingLot.doc(id)
     .update({
       'distance' : double.parse((distance/1000).toStringAsFixed(1))
     });
-    print(distance);
   }
-  Future<void> _showError(String text) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(text),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('Ok'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   _goReservation(){
     userState
     .where('stateRent', isEqualTo: false)
@@ -261,13 +215,13 @@ class _HomeState extends State<Home> {
     .get()
         .then((value){
           if (value.docs.length > 0) {
-            //Navigator.pushNamed(context, MyReservations.ROUTER);
             Get.toNamed(Routers.RESERVATION);
           } else {
-            _showError('You do not have any reservations');
+            showDialogAnnounce(content: 'You do not have any reservations');
           }
     });
   }
+
   _goRent(){
     userState
         .where('stateRent', isEqualTo: true)
@@ -275,26 +229,26 @@ class _HomeState extends State<Home> {
         .get()
         .then((value){
       if (value.docs.length > 0) {
-        //Navigator.pushNamed(context, MyRentStates.ROUTER);
         Get.toNamed(Routers.MYRENTSTATES);
       } else {
-        _showError('You do not have any state rents');
+        showDialogAnnounce(content: 'You do not have any state rents');
       }
     });
   }
+
   _goToBill(){
     bill
     .where('idUser', isEqualTo: user.currentUser.uid)
         .get()
         .then((value) {
        if (value.docs.length > 0){
-         //Navigator.pushNamed(context, MyBills.ROUTER);
          Get.toNamed(Routers.MYBILLS);
        } else {
-         _showError('You do not have any bills');
+         showDialogAnnounce(content: 'You do not have any bills');
        }
     });
   }
+
   _announceCancelPoint(){
     userState
     .where('idUser', isEqualTo: user.currentUser.uid)
@@ -302,12 +256,10 @@ class _HomeState extends State<Home> {
     .get()
         .then((value){
           if (value.docs.length > 0){
-            _showError('Your state was deleted');
+            showDialogAnnounce(content: 'Your state was deleted');
           }
     });
   }
-
-
 
   Widget text(String text) {
     return Text(
@@ -315,11 +267,11 @@ class _HomeState extends State<Home> {
       style: TextStyle(fontSize: 18),
     );
   }
+
   Widget autoCompleteTextField() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: AutoCompleteTextField(
-        //controller: _suggestionTextFieldController,
         clearOnSubmit: false,
         suggestions: _destination,
         style: TextStyle(color: Colors.black),
@@ -329,7 +281,6 @@ class _HomeState extends State<Home> {
               icon: Icon(Icons.search),
               onPressed: () {
                 _query();
-                //_chooseDestination = null;
               },
             ),
             hintText: 'Enter your destination',
@@ -360,7 +311,6 @@ class _HomeState extends State<Home> {
           }
         },
         itemBuilder: (context , item) {
-          //print(item);
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -469,12 +419,6 @@ class _HomeState extends State<Home> {
                   trailing: Icon(Icons.arrow_right),
                   title: Text('Profile', style: TextStyle(fontSize: 18),),
                   onTap: (){
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => Information()
-                    //     )
-                    // );
                     Get.toNamed(Routers.INFORMATION);
                   },
                 ),
@@ -507,8 +451,6 @@ class _HomeState extends State<Home> {
                   child: GestureDetector(
                     onTap: (){
                       FirebaseAuth.instance.signOut().then((_){
-                        // Navigator.of(context)
-                        //     .pushReplacementNamed( Login.ROUTER);
                         Get.offAll(Login());
                       });
                     },

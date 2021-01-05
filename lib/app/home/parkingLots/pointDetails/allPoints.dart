@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/reservationDetails.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/point/PointJson.dart';
 import 'package:get/get.dart';
-
 
 class ShowAllPoints extends StatefulWidget {
   String documentId;
@@ -20,16 +20,10 @@ class ShowAllPoints extends StatefulWidget {
 }
 
 class _ShowAllPointsState extends State<ShowAllPoints> {
-
   String documentId, _nameUser, _namePL, _addressPL;
   DateTime rentedTime, returnTime;
   int _numberPhonePL, _deposit, _price, _penalty;
   _ShowAllPointsState({this.documentId, this.returnTime, this.rentedTime});
-  final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
-  final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-  final CollectionReference point = FirebaseFirestore.instance.collection('point');
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
-  final FirebaseAuth user = FirebaseAuth.instance;
   final List<ArrangePoint2> arrangePoint2 = [
     ArrangePoint2(point: 'A1', state: true),
     ArrangePoint2(point: 'A2', state: true),
@@ -41,71 +35,6 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
     ArrangePoint2(point: 'D2', state: true),
   ];
 
-
-  Future<void> _showMyDialog(String point) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Would you like to make a reservation at this $point point?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('No'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-            RaisedButton(
-              color: Colors.green,
-              child: Text('Yes'),
-              onPressed: () {
-                //_check();
-                _makeReservation(point);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  Future<void> _showError(String point) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('You can\'t book this $point point'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('ok'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
   _makeReservation(String namePoint) async {
     point
         .add({
@@ -134,12 +63,6 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
       }).then((value2) async {
         await userState.doc(value2.id).update({'idUserState' : value2.id});
         await Get.back();
-        // Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => ReservationDetails(
-        //       idUserState: value2.id,
-        //     ))
-        // );
         Get.off(ReservationDetails(
           idUserState: value2.id,
         ));
@@ -204,14 +127,20 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
     });
   }
 
-
   Widget container(String namePoint, String idPL, bool color){
     return GestureDetector(
       onTap: (){
         if (color){
-          _showMyDialog(namePoint);
+          showDialogChoose(
+              content: 'Would you like to make a reservation at this $namePoint point?',
+              onConfirm: () => _makeReservation(namePoint),
+              textCancel: 'No',
+              textConfirm: 'Yes'
+          );
         } else {
-          _showError(namePoint);
+          showDialogAnnounce(
+              content: 'You can\'t book this $namePoint point'
+          );
         }
       },
       child: Container(
@@ -226,9 +155,11 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('All point'),
@@ -237,19 +168,19 @@ class _ShowAllPointsState extends State<ShowAllPoints> {
             icon: Icon(Icons.directions),
             onPressed: (){
               _checkColor();
-              //_check();
-              // _showMyDialog('hihi');
             },
           )
         ],
       ),
       body: Container(
+          width: isPortrait ? width : width/2,
+          height: double.infinity,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: GridView.builder(
                 itemCount: arrangePoint2.length,
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 250,
+                    maxCrossAxisExtent: isPortrait ? width/2 : width/4,
                     childAspectRatio: 1,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10

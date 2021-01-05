@@ -3,6 +3,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
 import 'package:flutter_app_parkinglots/data/point/PointJson.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
@@ -32,15 +33,7 @@ class _RentStateDetailsState extends State<RentStateDetails> {
   final format = DateFormat("dd-MM-yyyy HH:mm");
   Timestamp _returnTime; DateTime _returnTimeNew;
   final DateTime _now = DateTime.now();
-  Widget text(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 21),
-      ),
-    );
-  }
+
   @override
   void initState() {
     _getInforPL();
@@ -63,34 +56,7 @@ class _RentStateDetailsState extends State<RentStateDetails> {
        });
     });
   }
-  Future<void> _announce(String text) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(text),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('ok'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   _getBill() {
     userState
         .doc(idUserState)
@@ -110,13 +76,9 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         'returnTime' : _now,
         'phoneNumbersPL' : _userState.phoneNumbersPL,
         'returnPointTime' : _now,
-        //'timeUsed' : _now.difference(_userState.rentedTime.toDate())
       }).then((value2) async {
         await _updateBill(_userState.rentedTime, _userState.returnTime, value2.id);
         await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BillDetails(
-        //   idBill: value2.id,
-        // )));
         Get.off(BillDetails(
           idBill: value2.id,
         ));
@@ -159,8 +121,7 @@ class _RentStateDetailsState extends State<RentStateDetails> {
     if (_now.isBefore(returnTime.toDate().subtract(Duration(minutes: 30)))){
       _showMyDialog();
     } else {
-      //_showMyDialog();
-      _announce('You must renew 30 minutes before the overdue');
+      showDialogAnnounce(content: 'You must renew 30 minutes before the overdue');
     }
   }
   Future<void> _showMyDialog() async {
@@ -182,7 +143,6 @@ class _RentStateDetailsState extends State<RentStateDetails> {
               color: Colors.green,
               child: Text('Cancel'),
               onPressed: () {
-                //Navigator.of(context).pop();
                 Get.back();
               },
             ),
@@ -208,17 +168,11 @@ class _RentStateDetailsState extends State<RentStateDetails> {
         .doc(idUserState)
         .update({
       'returnTime' : _returnTimeNew
-    }).then((value) async {
-      await Get.back();
-      // Navigator.pushReplacement(
-      //     context,
-      //     MaterialPageRoute(builder: (context) => RentStateDetails(
-      //       idUserState: idUserState,
-      //     ))
-      // );
-      Get.off(RentStateDetails(
-        idUserState: idUserState,
-      ));
+    }).then((value) {
+      Get.back();
+      setState(() {
+        _returnTime = Timestamp.fromDate(_returnTimeNew);
+      });
     });
   }
   _checkPoint(){
@@ -240,7 +194,7 @@ class _RentStateDetailsState extends State<RentStateDetails> {
             _updateTime();
           } else {
             print('cancel');
-            _announce('This time has been used by someone else');
+            showDialogAnnounce(content: 'This time has been used by someone else');
           }
         });
       }
@@ -274,10 +228,9 @@ class _RentStateDetailsState extends State<RentStateDetails> {
     if (_returnTimeNew.isAfter(_returnTime.toDate().add(Duration(hours: 1)))){
       _checkPoint();
     } else {
-      _announce('Rental time is at least 1 hour');
+      showDialogAnnounce(content: 'Rental time is at least 1 hour');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -285,20 +238,21 @@ class _RentStateDetailsState extends State<RentStateDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Rental details'),
-        leading: IconButton(
-          icon: Icon(Icons.home),
-          onPressed: (){
-            //Navigator.pushNamed(context, Home.ROUTER);
-            Get.toNamed(Routers.HOME);
-          },
-        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.directions_car),
             onPressed: (){
-              //Navigator.pushNamed(context, MyRentStates.ROUTER);
               Get.toNamed(Routers.MYRENTSTATES);
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: IconButton(
+              icon: Icon(Icons.home),
+              onPressed: (){
+                Get.toNamed(Routers.HOME);
+              },
+            ),
           )
         ],
       ),

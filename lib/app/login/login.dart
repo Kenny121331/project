@@ -1,26 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLots.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class Login extends StatefulWidget {
-
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-
-  final addParkingLots = AddParkingLots();
   String _errorEmail, _errorPassword;
   bool _emailCheck = false; bool _passwordCheck = false;
-  final FirebaseAuth user = FirebaseAuth.instance;
-  final CollectionReference users = FirebaseFirestore.instance.collection('users');
   final GlobalKey<ScaffoldState> _scafoldKey = new GlobalKey<ScaffoldState>();
   String _email, _password;
   bool _hide = true;
@@ -34,7 +28,7 @@ class _LoginState extends State<Login> {
     super.initState();
   }
   setUp() {
-    addParkingLots..addParkingLot();
+    addParkingLots.addParkingLot();
     addParkingLots.getPoints();
     addParkingLots.getStatePL();
     addParkingLots.checkReservation();
@@ -44,36 +38,11 @@ class _LoginState extends State<Login> {
     await http.get(url).then((value) async {
       print('internet ok');
     })
-        .catchError((e) => _announce());
+        .catchError((e) => showDialogAnnounce(
+      content: 'Please check your internet!'
+    ));
   }
-  Future<void> _announce() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Announce'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('no internet?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            RaisedButton(
-              color: Colors.green,
-              child: Text('ok'),
-              onPressed: () {
-                //Navigator.of(context).pop();
-                Get.back();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+
   _navigateAndDisplaySelection(BuildContext context) async {
     final result = await Get.toNamed(Routers.REGISTER);
     if(result != null) {
@@ -214,10 +183,7 @@ class _LoginState extends State<Login> {
                           Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: RaisedButton(
-                              onPressed: (){
-                                //_checkInternet();
-                                _loginUser();
-                              },
+                              onPressed: () => _loginUser(),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)
                               ),
@@ -235,7 +201,6 @@ class _LoginState extends State<Login> {
                         padding: const EdgeInsets.only(top: 5),
                         child: GestureDetector(
                           onTap: (){
-                            //Navigator.pushNamed(context, GetPassword.ROUTER);
                             Get.toNamed(Routers.FORGETPASSWORD);
                           },
                           child: Center(

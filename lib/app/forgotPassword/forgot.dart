@@ -1,26 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/login/login.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
+import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
+import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:get/utils.dart';
 import 'package:get/get.dart';
 
 class GetPassword extends StatefulWidget {
-
   @override
   _GetPasswordState createState() => _GetPasswordState();
 }
 
 class _GetPasswordState extends State<GetPassword> {
-
   String _email, _announce;
   bool _announceCheck = true;
   bool _checkEmail;
 
-
   Future<void> _check() async {
-    await FirebaseFirestore.instance
-        .collection('users')
+    await users
         .get()
         .then((QuerySnapshot querySnapshot) {
       querySnapshot.docs.forEach((doc) {
@@ -31,30 +29,9 @@ class _GetPasswordState extends State<GetPassword> {
     });
     if(_checkEmail == true){
       FirebaseAuth.instance.sendPasswordResetEmail(email: _email).then((value){
-        return showDialog<void>(
-          context: context,
-          barrierDismissible: false, // user must tap button!
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Announce'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text('Please check your email to get password')
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                RaisedButton(
-                  color: Colors.green,
-                  child: Text('Approve'),
-                  onPressed: () {
-                    Get.offAll(Login());
-                  },
-                ),
-              ],
-            );
-          },
+        showDialogAnnounce(
+            content: 'Please check your email to get password',
+            onCancel: () => Get.offAllNamed(Routers.LOGIN)
         );
       });
     } else {
