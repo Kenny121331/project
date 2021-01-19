@@ -8,7 +8,6 @@ class BillJson {
   String idUser;
   String idPoint;
   String idPL;
-  String namePoint;
   int deposit;
   int price;
   int penalty;
@@ -26,7 +25,6 @@ class BillJson {
         this.idUser,
         this.idPoint,
         this.idPL,
-        this.namePoint,
         this.deposit,
         this.price,
         this.penalty,
@@ -45,7 +43,6 @@ class BillJson {
     idUser = json['idUser'];
     idPoint = json['idPoint'];
     idPL = json['idPL'];
-    namePoint = json['namePoint'];
     deposit = json['deposit'];
     price = json['price'];
     penalty = json['penalty'];
@@ -65,7 +62,6 @@ class BillJson {
     data['idUser'] = this.idUser;
     data['idPoint'] = this.idPoint;
     data['idPL'] = this.idPL;
-    data['namePoint'] = this.namePoint;
     data['deposit'] = this.deposit;
     data['price'] = this.price;
     data['penalty'] = this.penalty;

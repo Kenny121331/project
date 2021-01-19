@@ -12,26 +12,22 @@ import 'package:get/get.dart';
 
 // ignore: must_be_immutable
 class ReservationDetails extends StatefulWidget {
-  String idUserState;
-  ReservationDetails({this.idUserState});
 
   @override
-  _ReservationDetailsState createState() => _ReservationDetailsState(
-    idUserState: idUserState
-  );
+  _ReservationDetailsState createState() => _ReservationDetailsState();
 }
 
 class _ReservationDetailsState extends State<ReservationDetails> {
   String idUserState;
-  _ReservationDetailsState({this.idUserState});
-  final DateTime _now = DateTime.now();
 
   @override
   void initState() {
-    // TODO: implement initState
+    idUserState = Get.arguments;
     super.initState();
   }
+
   _checkConditionCancel(){
+    final DateTime _now = DateTime.now();
     userState
     .doc(idUserState)
         .get()
@@ -56,24 +52,23 @@ class _ReservationDetailsState extends State<ReservationDetails> {
   _cancelPoint() async {
     await userState
     .doc(idUserState)
-        .delete();
-    await Get.back();
+        .delete().then((value) => Get.back());
     Get.offNamed(Routers.HOME);
   }
+
   _cancelPointWithDeposit() {
     userState
     .doc(idUserState)
         .get()
-        .then((value) async {
-          var _userState = UserStateJson.fromJson(value.data());
-         await point.doc(_userState.idPoint).delete().then((value) => print('deleted point'));
+        .then((value) {
+          final UserStateJson _userState = UserStateJson.fromJson(value.data());
+          addParkingLots.exceptPointPL(_userState.idPL);
           bill.add({
             'nameUser' : _userState.nameUser,
             'idUser' : _userState.idUser,
             'namePL' : _userState.namePL,
             'addressPL' : _userState.addressPL,
             'idPL' : _userState.idPL,
-            'namePoint' : _userState.namePoint,
             'rentedTime' : _userState.rentedTime,
             'returnTime' : _userState.returnTime,
             'phoneNumbersPL' : _userState.phoneNumbersPL,
@@ -82,32 +77,38 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             await bill.doc(value2.id).update({
               'idBill' : value2.id
             });
+            Get.back();
             await userState.doc(idUserState).delete().then((value3) => print('deleted'));
-            await Get.back();
-            Get.off(BillDetails(idBill: value2.id));
+            Get.offNamed(
+              Routers.BILLDETAILS,
+              arguments: value2.id
+            );
           });
     });
   }
+
   _rent(){
+    final DateTime _now = DateTime.now();
     userState
         .doc(idUserState)
         .get()
         .then((value) async {
-          var _userState = UserStateJson.fromJson(value.data());
-      if (_checkRentalState(_userState.rentedTime)){
-        await addParkingLots.changePoint(_userState.idPL, _userState.namePoint, true);
+          final UserStateJson _userState = UserStateJson.fromJson(value.data());
+      if (_checkRentalState(_userState.rentedTime, _now)){
         userState
             .doc(idUserState)
             .update({
           'stateRent' : true,
-          'timeGetPoint' : _now
+          'rentedTime' : _now
         }).then((value) async {
-          Get.off(RentStateDetails(
-            idUserState: idUserState,
-          ));
+          await addParkingLots.addPointPL(_userState.idPL);
+          Get.offNamed(
+            Routers.MYRENTSTATESDETAILS,
+            arguments: idUserState
+          );
         });
       } else {
-        if(_compareTime(_userState.rentedTime)){
+        if(_compareTime(_userState.rentedTime, _now)){
           showDialogAnnounce(
             content: 'You can\'t get this point too early'
           );
@@ -120,16 +121,18 @@ class _ReservationDetailsState extends State<ReservationDetails> {
       }
     });
   }
-  bool _checkRentalState(Timestamp rentedTime){
-    if (_now.isBefore(rentedTime.toDate().subtract(Duration(minutes: 10))) ||
-        _now.isAfter(rentedTime.toDate().add(Duration(minutes: 15)))){
+
+  bool _checkRentalState(Timestamp rentedTime, DateTime now){
+    if (now.isBefore(rentedTime.toDate().subtract(Duration(minutes: 10))) ||
+        now.isAfter(rentedTime.toDate().add(Duration(minutes: 15)))){
       return false;
     } else {
       return true;
     }
   }
-  bool _compareTime(Timestamp rentedTime){
-    if (_now.isBefore(rentedTime.toDate().subtract(Duration(minutes: 10)))){
+
+  bool _compareTime(Timestamp rentedTime, DateTime now){
+    if (now.isBefore(rentedTime.toDate().subtract(Duration(minutes: 10)))){
       return true;
     } else {
       return false;
@@ -141,6 +144,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text('Booking details'),
         actions: <Widget>[
           IconButton(
@@ -159,9 +163,9 @@ class _ReservationDetailsState extends State<ReservationDetails> {
             return Text("Something went wrong");
           }
           if (snapshot.connectionState == ConnectionState.done) {
-            var _userState = UserStateJson.fromJson(snapshot.data.data());
-            String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());
-            String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_userState.returnTime.toDate());
+            final UserStateJson _userState = UserStateJson.fromJson(snapshot.data.data());
+            final String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());
+            final String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_userState.returnTime.toDate());
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView(
@@ -171,7 +175,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                     children: <Widget>[
                       text('Name customer: ${_userState.nameUser}'),
                       text('Name parking lot: ${_userState.namePL}'),
-                      text('Name point: ${_userState.namePoint}'),
                       text(_userState.addressPL),
                       text('Phone numbers of PL: ${_userState.phoneNumbersPL.toString()}'),
                       text('From: $_rentedTime'),
@@ -211,7 +214,6 @@ class _ReservationDetailsState extends State<ReservationDetails> {
               ),
             );
           }
-
           return Center(child: CircularProgressIndicator());
         },
       ),

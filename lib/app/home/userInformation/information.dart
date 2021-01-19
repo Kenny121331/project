@@ -35,6 +35,7 @@ class _InformationState extends State<Information> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        centerTitle: true,
         title: Text(name),
       ),
       body: _WIDGET_OPTION.elementAt(_selectedIndex),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/bill/billDetails.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/bill/BillJson.dart';
 import 'package:flutter_app_parkinglots/data/firebase/data.dart';
@@ -13,6 +13,7 @@ class MyBills extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
             'All bill'
         ),
@@ -31,16 +32,17 @@ class MyBills extends StatelessWidget {
           return new ListView(
             children: snapshot.data.docs.map((DocumentSnapshot document) {
               if (document.data().length > 0){
-                var _bill = BillJson.fromJson(document.data());
-                String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_bill.rentedTime.toDate());
-                String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_bill.returnTime.toDate());
+                final BillJson _bill = BillJson.fromJson(document.data());
+                final String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_bill.rentedTime.toDate());
+                final String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_bill.returnTime.toDate());
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      Get.to(BillDetails(
-                        idBill: _bill.idBill,
-                      ));
+                      Get.toNamed(
+                        Routers.BILLDETAILS,
+                        arguments: _bill.idBill
+                      );
                     },
                     child: Container(
                       height: 140,
@@ -67,7 +69,7 @@ class MyBills extends StatelessWidget {
                     ),
                   ),
                 );
-              }else {
+              } else {
                 return Center(
                   child: text('You don\'t have any bills'),
                 );

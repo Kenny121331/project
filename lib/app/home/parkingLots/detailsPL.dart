@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/pointDetails/allPoints.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/addParkingLots/parkingLotsJson/parkingLotJson.dart';
+import 'package:flutter_app_parkinglots/data/agrument/agrumentModel.dart';
 import 'package:flutter_app_parkinglots/data/firebase/data.dart';
+import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class DetailsPL extends StatefulWidget {
   final String documentId;
   DetailsPL({this.documentId});
+
   @override
   _DetailsPLState createState() => _DetailsPLState(
     documentId: documentId
@@ -23,6 +26,7 @@ class _DetailsPLState extends State<DetailsPL> {
   DateTime rentedTime, returnTime;
   final String documentId;
   _DetailsPLState({this.documentId});
+
   Widget dateTimeFieldRent(){
     return DateTimeField(
       format: format,
@@ -47,6 +51,7 @@ class _DetailsPLState extends State<DetailsPL> {
       },
     );
   }
+
   Widget dateTimeFieldReturn(){
     return DateTimeField(
       format: format,
@@ -70,6 +75,7 @@ class _DetailsPLState extends State<DetailsPL> {
       },
     );
   }
+
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
@@ -107,6 +113,7 @@ class _DetailsPLState extends State<DetailsPL> {
       },
     );
   }
+
   _checkTimeChoose() async {
     if (rentedTime != null && rentedTime != null){
       if (rentedTime.isBefore(_now.subtract(Duration(minutes: 5)))){
@@ -119,12 +126,7 @@ class _DetailsPLState extends State<DetailsPL> {
               content: 'You have hired at least one hours'
           );
         } else {
-          await Get.back();
-          Get.to(ShowAllPoints(
-            documentId: documentId,
-            rentedTime: rentedTime,
-            returntime: returnTime,
-          ));
+          makeArgument();
         }
       }
     } else {
@@ -134,14 +136,43 @@ class _DetailsPLState extends State<DetailsPL> {
     }
   }
 
+  Future<void> makeArgument() async {
+    Get.back();
+    int pointsUsed = 0;
+    await userState
+    .where('idPL', isEqualTo: documentId)
+    .get()
+    .then((value){
+      value.docs.forEach((element) {
+        final UserStateJson userStateJson = UserStateJson.fromJson(element.data());
+        if (rentedTime.isAfter(userStateJson.rentedTime.toDate().add(Duration(minutes: 20))) ||
+            returnTime.isBefore(userStateJson.rentedTime.toDate().subtract(Duration(minutes: 20)))
+        ){
+          // don't do anything :))
+        } else {
+          pointsUsed++;
+        }
+      });
+    });
+    Get.toNamed(
+        Routers.STATEPL,
+        arguments: Argument(
+            idPL: documentId,
+            rentedTime: rentedTime,
+            returnTime: returnTime,
+            pointsUsed: pointsUsed
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Text(
               'Parking lot'
           ),
-
         ),
         body: FutureBuilder<DocumentSnapshot>(
             future: parkingLot.doc(documentId).get(),
@@ -150,6 +181,7 @@ class _DetailsPLState extends State<DetailsPL> {
               if (snapshot.hasError) {
                 return Text("Something went wrong");
               }
+
               if (snapshot.connectionState == ConnectionState.done) {
                 var _parkingLot = ParkingLotJson.fromJson(snapshot.data.data());
                 return ListView(
@@ -167,15 +199,15 @@ class _DetailsPLState extends State<DetailsPL> {
                           ),
                           richText(
                               text1: 'Price per hour rental: ',
-                              text2: '${_parkingLot.price} vnd'
+                              text2: '${_parkingLot.price}k vnd'
                           ),
                           richText(
                               text1: 'Overdue penalty price: ',
-                              text2: '${_parkingLot.penalty} vnd'
+                              text2: '${_parkingLot.penalty}k vnd'
                           ),
                           richText(
                               text1: 'Booking price: ',
-                              text2: '${_parkingLot.deposit} vnd'
+                              text2: '${_parkingLot.deposit}k vnd'
                           ),
 
                           Padding(
@@ -185,7 +217,7 @@ class _DetailsPLState extends State<DetailsPL> {
                                 color: Colors.green,
                                 onPressed: _showMyDialog,
                                 child: Text(
-                                    'Find empty point'
+                                    'Choose the rental period'
                                 ),
                               ),
                             ),

@@ -5,5 +5,4 @@ final FirebaseAuth user = FirebaseAuth.instance;
 final CollectionReference users = FirebaseFirestore.instance.collection('users');
 final CollectionReference parkingLot = FirebaseFirestore.instance.collection('parkingLot');
 final CollectionReference userState = FirebaseFirestore.instance.collection('userState');
-final CollectionReference point = FirebaseFirestore.instance.collection('point');
 final CollectionReference bill = FirebaseFirestore.instance.collection('bill');

@@ -16,7 +16,7 @@ class AddParkingLots{
       'penalty' : 250,
       'deposit' : 60,
       'numberPhone' : 1010101010,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'},
+      'totalPoints' : 13
     }); // Học viện an ninh
     parkingLot
         .doc('N009')
@@ -29,7 +29,7 @@ class AddParkingLots{
       'penalty' : 22,
       'deposit' : 130,
       'numberPhone' : 9999999999,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 25
     }); // Cao đẳng dược Hà Nội
     parkingLot
         .doc('N008')
@@ -42,7 +42,7 @@ class AddParkingLots{
       'penalty' : 150,
       'deposit' : 50,
       'numberPhone' : 8888888888,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 17
     }); // Đại học công nghiệp
     parkingLot
         .doc('N007')
@@ -55,7 +55,7 @@ class AddParkingLots{
       'penalty' : 200,
       'deposit' : 50,
       'numberPhone' : 7777777777,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 5
     }); // Học viện ngoại giao
     parkingLot
         .doc('N006')
@@ -68,7 +68,7 @@ class AddParkingLots{
       'penalty' : 45,
       'deposit' : 20,
       'numberPhone' : 6666666666,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 7
     }); // Đại học kinh tế quốc dân
     parkingLot
         .doc('N005')
@@ -81,7 +81,7 @@ class AddParkingLots{
       'deposit' : 30,
       'penalty' : 400,
       'numberPhone' : 5555555555,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 20
     }); //Đại học Thăng Long
     parkingLot
         .doc('N004')
@@ -94,7 +94,7 @@ class AddParkingLots{
       'penalty' : 30,
       'deposit' : 20,
       'numberPhone' : 4444444444,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 12
     }); // Đại học Hà Nội
     parkingLot
         .doc('N003')
@@ -107,7 +107,7 @@ class AddParkingLots{
       'penalty' : 50,
       'deposit' : 34,
       'numberPhone' : 3333333333,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 17
     }); // Học viện báo chí và tuyên truyền
     parkingLot
         .doc('N002')
@@ -120,7 +120,7 @@ class AddParkingLots{
       'penalty' : 30,
       'deposit' : 25,
       'numberPhone' : 2222222222,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 23
     }); // Học viện ngân hàng
     parkingLot
         .doc('N001')
@@ -133,80 +133,44 @@ class AddParkingLots{
       'penalty' : 30,
       'deposit' : 20,
       'numberPhone' : 111111111,
-      //'allPoint' : {'A1', 'A2', 'A3', 'B1', 'B2', 'B3'}
+      'totalPoints' : 50
     }); //Bãi đỗ Bách Khoa
+    addPointsUsed();
   }
-  void getPoints(){
+
+  void addPointsUsed(){
     parkingLot
-        .get()
-        .then((doc){
-      doc.docs.forEach((element) {
-        if(element.data()['allPoints'] == null){
-          parkingLot
-              .doc(element.id)
-              .update({
-            'allPoints' : {
-              'A1' : false,
-              'A2' : false,
-              'B1' : false,
-              'B2' : false,
-              'C1' : false,
-              'C2' : false,
-              'D1' : false,
-              'D2' : false,
-            },
-            'statePL' : true
-          });
-        }
-      });
-    });
-  }
-  void getStatePL() async {
-    bool _statePL = false;
-    await parkingLot
     .get()
         .then((value){
        value.docs.forEach((element) {
-         var _allPoint = AllPoints.fromJson(element.data()['allPoints']);
-         _checkState(_allPoint.toJson(), _statePL, element.id);
+         if (element.data()['pointsUsed'] == null){
+           parkingLot.doc(element.id).update(
+               {'pointsUsed' : 0}
+           );
+         }
        });
     });
   }
-  _checkState(Map<dynamic, dynamic> list, bool statePL, String id) async {
-    await list.forEach((key, value) {
-      if (value == false){
-        statePL = true;
-      }
-    });
-    _changeStatePL(id, statePL);
-  }
-  _changeStatePL(String id, bool state) {
+
+  void checkCurrentState(){
     parkingLot
-    .doc(id)
-        .update({
-      'statePL' : state
-    }).then((value) => state = false);
-  }
-  void changePoint(String idPL, String namePoint, bool addOrDelete) async {
-    Map<String, dynamic> _allPoints;
-    await parkingLot
-    .doc(idPL)
     .get()
-    .then((value){
-      _allPoints = value.data()['allPoints'];
-    });
-    await _allPoints.forEach((key, value) {
-      if (key == namePoint){
-        _allPoints[key] = addOrDelete;
-        print(addOrDelete);
-      }
-    });
-    parkingLot
-    .doc(idPL)
-    .update({
-      'allPoints' : _allPoints
+        .then((value){
+       value.docs.forEach((element) {
+         final ParkingLotJson parkingLotJson = ParkingLotJson.fromJson(element.data());
+         if (parkingLotJson.totalPoints > parkingLotJson.pointsUsed){
+           parkingLot.doc(parkingLotJson.id).update({
+             'statePL' : true
+           });
+         } else {
+           parkingLot.doc(parkingLotJson.id).update({
+             'statePL' : false
+           });
+         }
+       });
     });
   }
+
   void checkReservation(){
     final DateTime _now = DateTime.now();
     userState
@@ -215,21 +179,42 @@ class AddParkingLots{
        value.docs.forEach((element) async {
          var _userState = UserStateJson.fromJson(element.data());
          if (
-         (_userState.notUsed == null) &&
-         (_userState.stateRent == false) &&
+         (!_userState.notUsed) &&
+         (!_userState.stateRent) &&
              (_now.isAfter(_userState.rentedTime.toDate().add(Duration(minutes: 15))))
          ){
+           exceptPointPL(_userState.idPL);
            await userState.doc(element.id).update({'notUsed' : true});
-           await point.doc(_userState.idPoint).delete();
-           changePoint(_userState.idPL, _userState.namePoint, false);
          } else if (
-         (_now.isAfter(_userState.returnTime.toDate().add(Duration(minutes: 10)))) && (_userState.notUsed == null)
+         (_now.isAfter(_userState.returnTime.toDate().add(Duration(minutes: 10)))) &&
+             (!_userState.notUsed) && (_userState.stateRent)
          ){
+           exceptPointPL(_userState.idPL);
            await userState.doc(element.id).update({'notUsed' : true});
-           await point.doc(_userState.idPoint).delete();
-           changePoint(_userState.idPL, _userState.namePoint, false);
          }
        });
+    });
+  }
+
+  void exceptPointPL(String idPL){
+    parkingLot
+    .doc(idPL)
+        .get()
+        .then((value){
+       parkingLot.doc(idPL).update({
+         'pointsUsed' : value.data()['pointsUsed'] - 1
+       });
+    });
+  }
+
+  void addPointPL(String idPL){
+    parkingLot
+        .doc(idPL)
+        .get()
+        .then((value){
+      parkingLot.doc(idPL).update({
+        'pointsUsed' : value.data()['pointsUsed'] + 1
+      });
     });
   }
 }

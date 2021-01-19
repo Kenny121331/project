@@ -29,9 +29,8 @@ class _LoginState extends State<Login> {
   }
   setUp() {
     addParkingLots.addParkingLot();
-    addParkingLots.getPoints();
-    addParkingLots.getStatePL();
     addParkingLots.checkReservation();
+    addParkingLots.checkCurrentState();
   }
   _checkInternet() async {
     final url = 'https://www.youtube.com/';
@@ -169,7 +168,8 @@ class _LoginState extends State<Login> {
                         children: <Widget>[
                           RaisedButton(
                             onPressed: (){
-                              _navigateAndDisplaySelection(context);
+                              //_navigateAndDisplaySelection(context);
+                              addParkingLots.checkCurrentState();
                             },
                             color: Colors.green,
                             shape: RoundedRectangleBorder(

@@ -8,9 +8,14 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
-class BillDetails extends StatelessWidget {
+class BillDetails extends StatefulWidget {
+
+  @override
+  _BillDetailsState createState() => _BillDetailsState();
+}
+
+class _BillDetailsState extends State<BillDetails> {
   String idBill;
-  BillDetails({this.idBill});
 
   Widget typeBill(int deposit, int price, int penalty, int timeUsed, int timeOverdue){
     if (deposit != null){
@@ -44,10 +49,18 @@ class BillDetails extends StatelessWidget {
       }
     }
   }
+
+  @override
+  void initState() {
+    idBill = Get.arguments;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
           'Bill details'
         ),
@@ -69,9 +82,8 @@ class BillDetails extends StatelessWidget {
             }
             if (snapshot.connectionState == ConnectionState.done) {
               var _bill = BillJson.fromJson(snapshot.data.data());
-              String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_bill.rentedTime.toDate());
-              String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_bill.returnTime.toDate());
-              //var _parkingLot = ParkingLotJson.fromJson(snapshot.data.data());
+              final String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_bill.rentedTime.toDate());
+              final String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_bill.returnTime.toDate());
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView(
@@ -81,7 +93,6 @@ class BillDetails extends StatelessWidget {
                       children: <Widget>[
                         text('Name customer: ${_bill.nameUser}'),
                         text('Name parking lot: ${_bill.namePL}'),
-                        text('Name point: ${_bill.namePoint}'),
                         text(_bill.addressPL),
                         text('Phone numbers of PL: ${_bill.phoneNumbersPL.toString()}'),
                         text('From: $_rentedTime'),

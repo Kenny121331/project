@@ -13,7 +13,7 @@ abstract class Routers {
   static const MYRENTSTATESDETAILS = '/myRentStatesDetails';
   static const MYBILLS = '/myBills';
   static const MYBILLSDETAILS = '/myBillsDetails';
-  static const SHOWALLPOINTS = '/showAllPoints';
   static const INFORMATION = '/information';
   static const DETAILSPL = 'detailsPL';
+  static const STATEPL = '/statePL';
 }

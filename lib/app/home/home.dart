@@ -336,6 +336,7 @@ class _HomeState extends State<Home> {
           icon: Icon(Icons.playlist_play, size: 40),
           onPressed: () => Scaffold.of(context).openDrawer(),
         )),
+        centerTitle: true,
         title: Text(
             'Find parking lot'
         ),

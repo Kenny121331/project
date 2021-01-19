@@ -6,7 +6,6 @@ class UserStateJson {
   String nameUser;
   String idUser;
   String idPL;
-  String namePoint;
   Timestamp rentedTime;
   Timestamp returnTime;
   int phoneNumbersPL;
@@ -24,7 +23,6 @@ class UserStateJson {
         this.nameUser,
         this.idUser,
         this.idPL,
-        this.namePoint,
         this.returnTime,
         this.rentedTime,
         this.phoneNumbersPL,
@@ -43,7 +41,6 @@ class UserStateJson {
     nameUser = json['nameUser'];
     idUser = json['idUser'];
     idPL = json['idPL'];
-    namePoint = json['namePoint'];
     rentedTime = json['rentedTime'];
     returnTime = json['returnTime'];
     phoneNumbersPL = json['phoneNumbersPL'];
@@ -63,7 +60,6 @@ class UserStateJson {
     data['nameUser'] = this.nameUser;
     data['idUser'] = this.idUser;
     data['idPL'] = this.idPL;
-    data['namePoint'] = this.namePoint;
     data['rentedTime'] = this.rentedTime;
     data['returnTime'] = this.returnTime;
     data['phoneNumbersPL'] = this.phoneNumbersPL;

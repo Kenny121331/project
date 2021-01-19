@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_parkinglots/app/home/parkingLots/reservation/reservationDetails.dart';
+import 'package:flutter_app_parkinglots/app/routers/App_routes.dart';
 import 'package:flutter_app_parkinglots/app/widget/common_widget.dart';
 import 'package:flutter_app_parkinglots/data/firebase/data.dart';
 import 'package:flutter_app_parkinglots/data/stateUser/userStateJson.dart';
@@ -13,8 +13,9 @@ class MyReservations extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
-            'My reservation states'
+            'My booking states'
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -33,16 +34,17 @@ class MyReservations extends StatelessWidget {
             children: snapshot.data.docs.map((DocumentSnapshot document) {
               print(document.data().length);
               if (document.data().length > 0){
-                var _userState = UserStateJson.fromJson(document.data());
-                String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());
-                String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_userState.returnTime.toDate());
+                final UserStateJson _userState = UserStateJson.fromJson(document.data());
+                final String _rentedTime = DateFormat('kk:mm  dd-MM-yyyy').format(_userState.rentedTime.toDate());
+                final String _returnTime= DateFormat('kk:mm  dd-MM-yyyy').format(_userState.returnTime.toDate());
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: new GestureDetector(
                     onTap: (){
-                      Get.to(ReservationDetails(
-                        idUserState: _userState.idUserState,
-                      ));
+                      Get.toNamed(
+                        Routers.RESERVATIONDETAILS,
+                        arguments: _userState.idUserState
+                      );
                     },
                     child: Container(
                       height: 140,
